@@ -66,19 +66,20 @@
 
 	    		$(_body)
 	    			.on('mouseup',function(){
-	    				pendraw = false;	    				
+	    				pendraw = false;	
+	    				_rzaction = false;    				
 	    			});
 	    		$(_pen)
 	    			.on('mousedown',function(e){
 	    				e = e||arguments[0];
-	    				e.stopPropagation();
+	    				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
 	    			});
 	    		
-	    		$(thegz)
+	    		$(document)
 		    		.on('mousedown',function(e){
 		    			e = e||arguments[0];
 		    			pendraw = true;		    			
-		    			if(e.which == 1){
+		    			if(e.which == 1){		    				
 							_pen.show();
 							_pen.css({'left':e.pageX,'top':e.pageY,'width':0,'height':0});
 							pos.startX = e.pageX;
@@ -86,14 +87,21 @@
 						}
 		    		}).on('mousemove',function(e){
 						e=e||arguments[0];
-						if(e.which==1&&pendraw)						
-							_pen.css({'background-color':'red','width':e.pageX-pos.startX,'height':e.pageY-pos.startY});
+						if(e.which==1&&pendraw){
+							if(e.pageX<thegzrect.left){
+		    					msg_box('show','超出绘制区域，请在绘制区域操作!',1000);
+		    					return false;
+		    				}else
+								_pen.css({'background-color':'red','width':e.pageX-parseInt(pos.startX),'height':e.pageY-parseInt(pos.startY)});
+						}
+						// console.log(e.pageX);
 					}).on('mouseup',function(e){
 						e = e||arguments[0];
 						if(_pen.width()>30&&_pen.height()>30){
 							kkk = e.ctrlKey ? new _unitDiv(_pen,thegz,'float') : new _unitDiv(_pen,thegz);							
 							subelement.push(kkk);
-						}
+						}else if(_pen.width()>3&&_pen.height()>3)
+							msg_box('show','最小30x30',1000);						
 						pos = {};
 					});
 
@@ -101,14 +109,13 @@
 					// $('.wangwang .wangwang').each(function(i){
 					// 	console.log(i);
 					// });
-
-
 					
 	    	});
 	        return this;
 	    }
 	}
 	var _nrect;
+	var _rzrect, _rzobj, _rzaction=false;
 	var unitdrag = false;
 	var _unitDiv=Class.create();
 	var cloneunit = false;
@@ -125,10 +132,27 @@
 			(type=='float') ? position = 'float:left;' : position = 'position:absolute;';
 			var idindex = subelement.length>0 ?  subelement.length : 0;
 			var _unit = $('<div idindex="'+idindex+'" class="wangwang" style="z-index:1000;left:'+(_rect.left-_crect.left)+'px;top:'+(_rect.top-_crect.top)+'px;background-color:green;width:'+_rect.width+'px;height:'+_rect.height+'px;'+position+'"></div>');			
+			$(_unit).append('<div class="_rzunit" style="cursor:nw-resize;width:7px;height:7px;background-color:red;position:absolute;bottom:-3px;right:-3px;font-size:0;">1</div>');
 			this.div = _unit[0];
 			$(container).append(_unit);
-			$(_unit).mouseover(function(e){				
-				if(cloneunit) {		
+			
+			$(_unit).children('._rzunit').mousedown(function(e){
+				e = e||arguments[0];
+				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
+				_rzaction=true;
+				_rzrect = __getRect(this.parentNode);
+				_rzobj = this.parentNode;
+			});
+			$(document).mousemove(function(e){
+				e = e||arguments[0];
+				if(e.which==1&&_rzaction===true){
+					$(_rzobj).css({'width':e.pageX-_rzrect.left,'height':e.pageY-_rzrect.top});
+				}
+			});
+			
+			$(_unit).mouseover(function(e){		
+				e = e||arguments[0];
+				if(cloneunit) {
 					if($('body').data('cloneunit')){
 						cloneunit=false;
 						var clone = $('body').data('cloneunit');
@@ -143,7 +167,7 @@
 			});
 			$(_unit).mousedown(function(e){
 				e = e||arguments[0];
-				e.stopPropagation();	
+				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
 				$(_unit).css('z-index',2000);			
 				// theunit = this;
 				// pendraw = false;
@@ -154,16 +178,11 @@
 				pos.startY = e.pageY;				
 			}).contextmenu(function(e){
 				e = e||arguments[0];
-				e.stopPropagation();
+				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
 				unitdrag = pendraw = false;			
 				console.log('contextmenu');
 			});		
-			// $(_unit).delegate('.wangwang','click',function(){
-			// 	alert('aaaaaaaaa');
-			// });
 
-
-			
 			var endleft,endtop;
 			$(container).mousemove(function(e){				
 				e = e||arguments[0];				
@@ -176,7 +195,7 @@
 				e = e||arguments[0];
 				var ttt;
 				if(e.target.className.toString().indexOf('wangwang')>-1){
-					e.stopPropagation();
+					e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
 				}
 				$(_unit).css('z-index',1000)
 				if(e.ctrlKey&&e.altKey) {					
