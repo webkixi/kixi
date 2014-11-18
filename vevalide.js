@@ -8,7 +8,7 @@
         // 全局模式
         vevalide($);
     }
-})(function($,base64){
+})(function($){
     $.base64 = base64;
     $.extend($.fn, {
         defaults:{
@@ -350,7 +350,7 @@
                 ve.regins.veshowmsg(item,ve.opts.infoUsername);
                 return false;
             }else{
-                if(chkvalue.velen()>16||chkvalue.velen()<6){                    
+                if(chkvalue.velen()>16||chkvalue.velen()<4){                    
                     ve.regins.veshowmsg(item,ve.opts.infoUsername);
                     return false;
                 }                
