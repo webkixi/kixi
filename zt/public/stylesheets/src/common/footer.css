@@ -1,0 +1,92 @@
+#footer-nav{
+    background: #c42774;
+    
+    color: white;
+    border-top: #F6E5EF 10px solid;
+    height: 225px;
+    margin-top: 15px;
+    padding: 40px 0;
+}
+#footer-nav .nav-list{
+    border-bottom: #D6689E 1px solid;
+}
+#footer-nav .nav-list a{
+    color: #fff;
+    letter-spacing: 2px;
+    margin: 0 7px 0 3px;
+}
+#footer-nav .nav-list i{
+    color: #fff;
+}
+#footer-nav .services{
+    color: #fff;
+    line-height: 25px;
+}
+#footer-nav .services .services-item{
+    color: #fff;
+}
+#footer-nav .services .services-item .title{
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+}
+#footer-nav .services .services-item .content{
+    color: #fff;
+    /* margin-top: -13px; */
+}
+#footer-nav .services .services-item .content p{
+    color: #fff;
+    margin: 0;
+}
+#footer-nav .services .services-item .content a{
+    color: #fff;
+}
+#footer{
+    text-align: center;
+    
+    color: #333333;
+    height: 125px;
+    padding: 15px 0 25px 0;
+}
+#footer p{
+    margin: 0;
+    margin-top: 10px;
+}
+#footer a{
+    color: #333333;
+}
+#footer .footer-beian{
+    display: block;
+}
+#footer .footer-beian .b{
+    background: url(/images/common/beian.png) no-repeat;
+    height: 50px;
+    display: inline-block;
+    letter-spacing: -13px;
+    text-indent: -150px;
+    overflow: hidden;
+}
+#footer .footer-beian .b1{
+    width: 122px;
+    background-position: 0 0;
+}
+#footer .footer-beian .b2{
+    width: 48px;  
+    background-position: -135px 0;
+}
+#footer .footer-beian .b3{
+    width: 114px;  
+    background-position: -196px 0;
+}
+#footer .footer-beian .b4{
+    width: 116px;  
+    background-position: -322px 0;
+}
+#footer .footer-beian .b5{
+    width: 114px;  
+    background-position: -451px 0;
+}
+#footer .footer-beian .b6{
+    width: 114px;  
+    background-position: -579px 0;
+}

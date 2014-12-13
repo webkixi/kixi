@@ -1,0 +1,102 @@
+.wrap{
+	width:1100px;
+	margin: 0 auto;
+}
+body{
+	 font-size: small; 
+	 line-height: 25px; 
+	 background: url(/img/common/body-bg.png) center no-repeat;
+}
+@font-face {
+    font-family: 've';
+    src: url('/fonts/vefont.eot');
+    src: url('/fonts/vefont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/vefont.woff2') format('woff2'),
+         url('/fonts/vefont.woff') format('woff'),
+         url('/fonts/vefont.ttf') format('truetype'),
+         url('/fonts/vefont.svg#iconfontmedium') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+/*reset*/
+ul{
+	margin: 0;
+}
+li{
+	color: #9a9a9a;
+	list-style: none;
+}
+i{
+	color: #9a9a9a;
+	font-style: normal;
+}
+/*link style*/
+a,a:visited{
+	color: #9a9a9a;
+	text-decoration: none;
+	outline:none;
+}
+a:hover{
+	color:#E62E8B;
+	text-decoration: none;
+}
+/*common*/
+.light{
+	color:#e62d8b ;
+}
+.icon{
+	font-family:"ve";
+}
+.icon.flip{
+    transition: 0.2s;
+	
+}
+a:hover .flip{
+	transform: rotate(180deg);
+}
+.hover-box{
+	display:none;
+	z-index: 999999999999;
+	position: absolute;
+	background: #F8F8F8;
+	top: 30px;
+	left: 0;
+	text-align: left;
+	padding: 0 20px 0 40px;
+}
+.hover-tigger:hover .hover-box{
+	display:block;
+}
+/*浮动*/
+.pull-left{
+	float: left;
+}
+.pull-right{
+	float: right;
+}
+/*文字对齐*/
+.text-left{
+	text-align: left;
+}
+.text-right{
+	text-align: right;
+}
+/*文字颜色*/
+.text-gray{
+	color: #9a9a9a;
+}
+.w-100{
+	width: 100%;
+}
+.w-1100{
+	width: 1100px;
+	margin: 0 auto;
+}
+
+/*高亮数字---用于特价，优惠价，库存，甩货等等*/
+.num-16{  /*首页特卖*/
+    color:red;
+    font-size: 20px;
+    font-family: "Microsoft Yahei","微软雅黑";
+}

@@ -1,0 +1,312 @@
+<style type="text/css">
+.floatbar{
+    position: fixed;
+    width: 70px;
+    height: 400px;
+    display: hidden;
+}
+</style>
+
+<!-- 浮动栏 -->
+
+<div class="floatbar">    
+    <div class="floatimg">
+        <img src="/images/index/leftfloatbar.png" alt="">
+    </div>
+</div>
+
+<!-- 浮动栏结束 -->
+<script type="text/javascript" src="/javascripts/src/common/vefixbar.js"></script>
+<script type="text/javascript">
+
+$(function(){
+    $(".floatbar").vefixbar()
+    .delay(2000)
+    .gun(70)
+    .setCss({'top':'350px','background-color':null,'width':null,'height':null})
+    .near($('.hots'))
+    .fixed(function(){
+        var that = this;
+        var wrap;
+        var btns;        
+        that.append('a.test*4',function(i,btn){
+            btn[0].href = 'http://www.163.com';
+            btn[0].style.cssText = 'position:absolute;left:0;top:0;width:100%;height:70px;text-indent:-9000px;';
+
+            btn[1].href = 'http://www.pconline.com.cn';
+            btn[1].style.cssText = 'position:absolute;left:0;top:75px;width:100%;height:70px;text-indent:-9000px;';
+
+            btn[2].href = 'http://www.ve.cn';
+            btn[2].style.cssText = 'position:absolute;left:0;top:150px;width:100%;height:70px;text-indent:-9000px;';
+
+            btn[3].href = 'http://www.beibei.com';
+            btn[3].style.cssText = 'position:absolute;left:0;top:220px;width:100%;height:70px;text-indent:-9000px;';
+        });
+    });
+});
+
+
+
+
+// require(['common/easy_login','sidebar/vefixbar',],function(c,vefixbar){
+    
+//     var AJAX_DELGOODS_URL='{url r="ajax#delcart"}';
+//     window.login = function(){
+//       c.ajax_login();
+//     }
+//     var aj = {
+//         login:{
+//           url  :'/',
+//           data : {ctl:'ajax',act:'logininfo'}
+//         }    
+//     };
+//     var jdata;
+//     var loginstat; 
+//     var nologin = '<ul> <li> <img src="{$STATIC_ROOT}ve_2_1/css/img/member/head-f.jpg?_ve_201430"> <span>您好，请先<a href="javascript:login();" class="loginBtn" style="cursor: pointer;"><em class="red">登陆</a> | </em> <a href="{url r="user#register"}#f=sidebar&md={$MODULE_NAME}" ><em class="red">注册</em></a></span> </li> </ul>';
+
+//     window.getJdata=function(){
+//       $(".slidebar").vefixbar()
+//       .ajax(aj.login.url,aj.login.data,function(data){
+//           jdata = data;
+//           loginstat = data.status;     
+//           $('.carnum').html(jdata.cart_total_num);     
+//       })
+//     }
+  
+
+    
+//   window.dosidebar = function(){
+//     $(".slidebar").show(300).vefixbar()  
+
+//     .btn('.btn','',function(c){        
+//         var pop0,pop1;
+//         $(this).mouseenter(function(){
+//           i = $(this).attr('idindex');          
+//           $(this).addClass('hover3');
+//           pop0    = $(this.parentNode).children('.pop0').prop('outerHTML');         
+//           pop1    = $(this.parentNode).children('.pop1').prop('outerHTML');
+         
+//           if(!loginstat)
+//               (i==1) ? $(c).html('<div class="popdiv">'+pop1+"</div>") : $(c).html('<div class="popdiv">'+pop0+"</div>");
+//           else{
+//               if(jdata&&jdata.user_info){
+//                   (jdata.user_info.pic) ? hpic = jdata.user_info.pic : hpic="{$STATIC}/css/img/member/head-f.jpg";                  
+//                   $(c).html('<div class="popdiv">'+pop1.replace('~uu~',jdata.user_info.user_name).replace('~headpic~',hpic)+"</div>");                  
+//                   $(c).find('img.headpic').attr('src',hpic);
+//                   // $(c).html('<div class="popdiv">'+pop1.replace('~uu~',jdata.user_info.user_name);
+//               }else
+//                 $(c).html('<div class="popdiv">'+pop1.replace('~uu~','唯一优品')+"</div>");
+//           } 
+          
+//         }).mouseleave(function(){
+//           $(this).removeClass('hover3');
+//         });
+//     })
+
+//     .btn('.sidebar','',function(c,fix){               
+//         var pop0,pop1;
+//         var tmp_str='';
+//         var goods_str = '<dd class="dd{{car.id}}">'+
+//             '<a class="block"><img src="{{car.icon}}"></a>'+
+//             '<div>'+
+//               '<span><a href="{{car.url}}#f=sidebar&md={$MODULE_NAME}">{{car.sub_name}}</a></span>'+  
+//               '<span>{{car.model}}</span>\
+//             </div>\
+//             <div>{{car.number}}</div>\
+//             <div class="fr">\
+//               <img class="delgoods" delid={{car.id}} jid={{car.jid}} jnum={{car.number}} jprice={{car.unit_price}} src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/close1.png?_ve_201430">\
+//               <span>{{car.unit_price}}</span>\
+//             </div>\
+//           </dd>';
+
+//         var goods_car_str = '<dl class="fix_child list pop1">\
+//           <dt><span>购物车</span><span class="closepng"></span></dt>\
+//           ~data~\
+//           <dd class="last">\
+//             <span class="fl">共<em class="red"> {{jdata.cart_total_num}} </em>件商品</span>\
+//             <span class="fr">￥{{jdata.cart_total_price}}</span>\
+//           </dd>\
+//           <dd><a href="{url r="cart"}#f=sidebar&md={$MODULE_NAME}">结算 <img src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/point.png?_ve_201430" > </a></dd>\
+//         </dl>';
+
+//         var coupon_str = '<dd>\
+//         <div style="display:block;position:relative;width:248px;height:106px;background:url({$STATIC_ROOT}ve_2_1/css/img/sidebar/yhbg.png)">\
+//           <div class="coupon_price"><span class="flag">￥</span><span class="num">{{coupon.value}}</span></div>\
+//           <div class="coupon_des" style="color:#af6822;">满{{coupon.condition}}元使用</div>\
+//           <div class="coupon_date" style="color:#af6822;">过期时间：{{coupon.valid_end_time}}</div>\
+//         </div>\
+//         </dd>';
+
+
+//         var carlist = function(obj,jid,jnum,jprice){
+//             tmp_str='';      
+//             if(jid){
+//                 jdata.cart_list.splice(jid,1);
+//                 jdata.cart_total_num = parseInt(jdata.cart_total_num-jnum);
+//                 jdata.cart_total_price = Math.round((jdata.cart_total_price-jnum*jprice)*100)/100;
+//                 if($(".cart_flag_all em").length)
+//                     $(".cart_flag_all em").text(parseInt(jdata.cart_total_num));
+//             }
+//             if(jdata&&jdata.cart_list&&jdata.cart_list.length>0){
+//                 for(var ii=0; ii<jdata.cart_list.length; ii++){
+//                     var car = jdata.cart_list[ii];
+//                     car.icon = car.icon.replace('\.\/','http://img.ve.cn/');
+//                     car.jid = ii;                    
+//                     car.unit_price = Math.round(car.unit_price*100)/100;
+//                     car.sub_name = _subString(car.sub_name,20);
+//                     car.model = (car.attr_str&&car.attr_str!==0) ? '型号:'+_subString(car.attr_str,10) : '';
+//                     tmp_str += goods_str.replace(/\{\{(.*?)\}\}/gi,function(a,b){
+//                         return eval(b);
+//                     });
+//                 }
+//                 jdata.cart_total_price = Math.round(jdata.cart_total_price*100)/100;                
+//                 pop1 = goods_car_str.replace(/\{\{(.*?)\}\}/gi,function(a,b){
+//                     return eval(b);
+//                 }).replace('~data~',tmp_str);
+//             }else{
+//                 pop1 = goods_car_str.replace(/\{\{(.*?)\}\}/gi,function(a,b){
+//                     return eval(b);
+//                 }).replace('~data~','<div style="padding:8px 14px;">亲，您的购物袋还没有商品！</div>');
+//             }
+//         }
+
+//         var couponlist = function(obj){
+//             tmp_str='';
+//             if(jdata&&jdata.coupon&&jdata.coupon.length>0){                
+//                 for(var jj=0; jj<jdata.coupon.length; jj++){
+//                   var coupon = jdata.coupon[jj];                  
+//                   tmp_str += coupon_str.replace(/\{\{(.*?)\}\}/gi,function(a,b){
+//                       return eval(b);
+//                   });
+//                 }
+//                 pop1 = $(obj.parentNode).children('.pop1').prop('outerHTML').replace(/\{\{(.*?)\}\}/gi,function(a,b){
+//                       return eval(b);
+//                 }).replace('~data~',tmp_str);
+//             }else{
+//                 pop1 = $(obj.parentNode).children('.pop2').prop('outerHTML');
+//             }
+//         }
+
+//         $(this).mouseenter(function(){
+//             var thebtn = this;
+//             i = $(this).attr('idindex');
+//             $(this).addClass('hover3');
+//             pop0 = $(this.parentNode).children('.pop0').prop('outerHTML');
+
+//             //默认hover弹出
+//             if(i==1)
+//                 $(c).html('');
+//             else
+//                 $(c).html('<div class="popdiv">'+pop0+"</div>");
+
+//             //优惠券初始化
+//             if(i==0){
+//                 couponlist(thebtn);
+//             }
+//             //购物车初始化
+//             else if(i==1){
+//                 carlist(thebtn);
+//             }
+
+//         }).mouseleave(function(){
+//             $(this).removeClass('hover3');
+//         });
+        
+//         //购物车及优惠券打开，及打开后的动作
+//         var delttt;
+//         $(this).on('click',function(e){
+//             e=e||arguments[0];
+//             e.stopPropagation();
+//             if(!loginstat){                
+//                 if(i==1){                  
+//                     setTimeout(setdraw,120);
+//                     $(c).html('<div class="popdiv">'+pop1+"</div>");
+//                 }else
+//                     $(c).html('<div class="popdiv">'+nologin+"</div>"); 
+//             }else{
+//                 setTimeout(setdraw,120);
+//                 $(c).html('<div class="popdiv">'+pop1+"</div>");
+//             }
+//         });
+
+//         function setdraw(){
+//             $(c).css('overflow-y','auto');
+//             var doc = _measurePopPos();
+//             $(c).stop().animate({'height':doc.dh,'top':0},150);
+//         }
+
+//         $(c).delegate('.closepng','click',function(){
+//             $(c).css({'display':'none'});
+//         });
+
+//         var thebtn = this;  
+//         $(c).delegate('.delgoods','click',function(){
+//             clearInterval(delttt);                
+//             var delid = $(this).attr('delid');
+//             var jid = $(this).attr('jid');
+//             var jnum = $(this).attr('jnum');
+//             var jprice = $(this).attr('jprice');
+//             fix.ajax(AJAX_DELGOODS_URL,{id:delid},function(data){
+//                 $.queue(thebtn,'delit',(function(){$(c).find('.dd'+delid).animate({'height':0,'margin':0,'padding':0});}));
+//                 $.queue(thebtn,'delit',(function(){
+//                     $(c).find('.dd'+delid).remove();
+//                 }));
+//                 $.queue(thebtn,'delit',(function(){carlist(thebtn,jid,jnum,jprice);}));
+//                 $.queue(thebtn,'delit',(function(){
+//                     $(c).html('<div class="popdiv">'+pop1+"</div>");
+//                 }));
+
+//                 $.queue(thebtn,'delit',(function(){
+//                     $('.carnum').html(jdata.cart_total_num);
+//                 }));
+
+//                 setInterval(function() {
+//                     delttt = $.dequeue(thebtn, 'delit');
+//                 }, 300);
+//             });
+//         });     
+//     })  
+
+
+//     .btn('.gotop','gotop',function(c){
+//         $(this).mouseenter(function(){
+//           i = $(this).attr('idindex');
+//           $(this).addClass('hover3');          
+//           $(c).html('<div style="padding:8px;border:1px solid #d3d3d3">返回顶部</div>');     
+//         }).mouseleave(function(){
+//           $(this).removeClass('hover3');
+//         });        
+//     })
+
+//     .rsp({xs:'.fix_area1',sm:'fix_area2'})    
+
+//     .fixed(function(){
+//       var kkk = function(){
+//         var thefix = window.fixbar;
+//         $('.carnum').html(jdata.cart_total_num);
+//         clearTimeout(t)
+//       }
+//       var t = setTimeout(kkk,500);
+//     });
+
+// }   
+
+//     predosidebar=function(){
+//       $(".slidebar").vefixbar()
+//       .ajax(aj.login.url,aj.login.data,function(data){
+//           if(data){
+//             jdata = data;
+//             loginstat = data.status;  
+//             var ttt = setTimeout(function(){
+//                 dosidebar();
+//             },2000);
+//           }else{
+//             return '';
+//           }
+//       })
+//     }
+//     predosidebar();
+    
+
+// }); //require结束
+</script>

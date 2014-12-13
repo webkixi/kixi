@@ -1,0 +1,7 @@
+/*index*/
+@import "common/common.css";
+@import "common/header-bar.css";
+@import "common/header.css";
+@import "index/hot.css"; /*热卖*/
+@import "index/spe.css"; /*特卖*/
+@import "common/footer.css";

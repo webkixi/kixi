@@ -1,0 +1,292 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/css/lib/pure.min.css">
+<link rel="stylesheet" href="/css/src/common/common.css">
+
+<style type="text/css">
+    *{
+        padding: 0px;
+        margin: 0px;
+    }
+    .outer{
+        width: 100%;
+    }
+    .inner{
+        width:500px;
+        margin: 0 auto;
+        background-color: #efefef;
+    }
+    h1{
+        text-indent: 300px;
+    }
+    /*hot widget css*/
+    .hotwarp{
+        width: 260px;
+        height: 350px;
+        padding-right: 20px;
+        position: relative;
+    }
+    .hotwarp .hot{
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+    .hotwarp .hot ul{
+        list-style: none;
+        position: relative;
+    }
+    .hotwarp .hot ul li{
+        position: absolute;
+    }
+    .hotwarp .hot .title1{
+        font-family: "Microsoft Yahei","微软雅黑";
+        font-size: 26px;
+        font-weight: bold;
+    }
+    .hotwarp .hot .title2{
+        font-family: '黑体';
+        font-size: 36px;
+    }
+    .hotwarp .hot .title3{}
+    
+
+
+    /*特卖*/
+    .warp_spe_sell{
+        width: 385px;
+        height: 305px;
+        padding: 10px;
+        position: relative;
+    }
+    .warp_spe_sell .picpart{
+        width: 385px;
+        height: 245px;
+        position: relative;
+    }
+    .picpart img{
+        width: 385px;
+    }
+
+    .warp_spe_sell .despart{
+        width: 100%;
+        height: 40px;
+        padding: 10px 0;    
+        position: relative;
+    }
+    .warp_spe_sell ul{
+        list-style: none;
+        position: relative;
+    }
+    .warp_spe_sell ul li{
+        position: absolute;
+    }
+    .warp_spe_sell .title1{
+        font-family: "Microsoft Yahei","微软雅黑";
+        font-size: 12px;
+        right: 0;
+        top:-5px;
+    }
+    .warp_spe_sell .title2{
+        font-family: "Microsoft Yahei","微软雅黑";
+        font-size: 14px;
+        right: 0;
+        top:21px;
+    }
+    .warp_spe_sell .title3{
+        left: 0;
+        top:-10px;
+    }
+    .warp_spe_sell .title3 img{
+        height: 62px;
+    }
+
+    .num-16{
+        color:red;
+        font-size: 20px;
+        font-family: "Microsoft Yahei","微软雅黑";
+    }
+
+
+</style>
+
+</head>
+<body>
+
+<h1> 热卖 </h1>
+<div class="outer">
+    <div class="inner">
+        <!-- hot widget html -->
+        <div class="hotwarp">
+            <div class="hot">
+                <img src="/img/widget/1.png" alt="">
+            </div>
+        </div>    
+    </div>
+</div>
+
+
+<hr style="margin: 20px;">    
+
+
+
+<h1> 特卖 </h1>
+<div class="outer">
+    <div class="inner">
+        <!-- 特卖 -->        
+        <div class="warp_spe_sell">
+            <div class="picpart">
+                <img src="/img/widget/temai.png" alt="">
+            </div>
+            <div class="despart">
+                <ul>
+                    <li class="title1">全场卖<span class='num-16'>1.6</span>折起</li>
+                    <li class="title2">德国进口爱他美奶粉特卖场</li>
+                    <li class="title3">
+                        <img src="/img/index/temai_logo.png" alt="">
+                    </li>
+                </ul>
+            </div>
+        </div>    
+    </div>
+</div>
+
+
+<hr style="margin: 20px;">    
+
+
+
+<style>
+    /* 导航  start*/
+/* 主导航  start*/
+#main-nav{
+    background: url(/img/common/main-nav-bg.png);
+    height: 40px;
+}
+#main-nav a{
+    color:white;
+}
+#main-nav .main-nav-list{
+    line-height: 40px;
+
+    color: white;
+    display: block;
+}
+#main-nav .main-nav-item{
+    float: left;
+    text-align: center;
+    width: 100px;
+    cursor: pointer;
+}
+#main-nav .main-nav-item.select{
+    background: #d3006b;
+}
+#main-nav .main-nav-item:hover{
+    background: rgba(0, 0, 0, 0.25);
+    background: #4B4B4B\9;
+}
+#nav-assure{
+    line-height: 40px;
+
+    color: white;
+}
+#nav-assure .item{
+    width: 40px;
+    
+    -webkit-transition: 0.5s ease;
+    overflow: hidden;
+}
+#nav-assure .item:hover{
+    width: 100px;
+    
+}
+/* 主导航  end*/
+
+/* 副导航 start */
+#sub-nav{
+    background: #F8F8F8;
+    border-bottom: #E0E0E0  1px solid;
+    height: 30px;
+    line-height: 31px;
+}
+#sub-nav a{
+    color: #a3a3a3;
+}
+#sub-nav .sub-nav-list{
+
+}
+#sub-nav .sub-nav-item{
+    float: left;
+    
+    width: 85px;
+    text-align: center;
+    cursor: pointer;
+}
+#sub-nav .sub-nav-item.select{
+    color: #e62d8b;
+    background: url(/img/common/main-nav-bg.png) repeat-x;
+    background-position-y: 28px;
+}
+#sub-nav .sub-nav-item:hover{
+    background: #E1E1E1;
+    color: #e62d8b;
+}
+#sub-nav .tel{
+    color: #9E9E9E;
+
+}
+#sub-nav .tel i{
+
+}
+/* 副导航 end */
+/* 导航 end*/
+</style>
+
+<h1> 导航条 </h1>
+<div id='main-nav'>
+    <div class="container wrap">
+        <div class="pure-g">
+            <div class="pure-u-1">
+                <ul class="main-nav-list">
+                    <a href="/"><li class="main-nav-item select"><span>首页</span></li></a>
+                    <a href="/"><li class="main-nav-item"><span>精挑细选</span></li></a>
+                    <a href="/"><li class="main-nav-item"><span>纸尿裤</span></li></a>
+                    <a href="/"><li class="main-nav-item"><span>奶粉</span></li></a>
+                    <a href="/"><li class="main-nav-item"><span>正品保证</span></li></a>
+                </ul>
+                <div id='nav-assure' class="pull-right">
+                    <div class="item pull-left">鸡鸡鸡鸡鸡鸡</div>
+                    <div class="item pull-left">蛋蛋蛋蛋蛋蛋</div>
+                    <div class="item pull-left">猪猪猪猪猪猪</div>
+                    <div class="item pull-left">蛋蛋蛋蛋蛋蛋</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id='sub-nav'>
+    <div class="container wrap">
+        <div class="pure-g">
+            <div class="pure-u-1">
+                <ul class="sub-nav-list">
+                    <a href="/"><li class="sub-nav-item"><span>首页</span></li></a>
+                    <a href="/"><li class="sub-nav-item select"><span>精挑细选</span></li></a>
+                    <a href="/"><li class="sub-nav-item"><span>纸尿裤</span></li></a>
+                    <a href="/"><li class="sub-nav-item"><span>奶粉</span></li></a>
+                    <a href="/"><li class="sub-nav-item"><span>正品保证</span></li></a>
+                    <a href="javascript:;"><li class="pull-left"><span>|</span></li></a>
+                    <a href="/"><li class="sub-nav-item"><span>年龄段</span><i>↑</i>
+                        <div></div>
+                    </li></a>
+                </ul>
+                <span class='tel pull-right'><i class="icon tel">○</i>tel：4006161111</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>

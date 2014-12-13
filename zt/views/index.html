@@ -1,0 +1,67 @@
+{{!< default.html}}
+{{#contentFor "mainArea"}}
+<!-- header start -->
+{{> common/header}}
+<!-- header stop -->
+<!-- dashboard start -->
+
+<!-- banner part start -->
+<div class="w-100">
+	<div class="w-1100">
+		<div class="pure-g">
+			<div class="pure-u-1" style="height:80px;">
+				
+			</div>
+		</div>
+	</div>
+</div>
+<!-- banner part end -->
+
+<!-- hot part -->
+<div class="w-100">
+	<div class="w-1100 hots">
+		<div class="pure-g">
+			{{> index/hot}}  
+			{{> index/hot}}  
+			{{> index/hot}}  
+			{{> index/hot}}
+		</div>
+	</div>
+</div>
+
+<!-- 今日特卖 838+262-->
+<div class="w-100" style="margin-top:30px;overflow: hidden;">
+	<div class="w-1100">
+		<!-- 特卖部分 -->
+		<div class="left-part" style="float:left;width:790px;padding-right:10px;maring-right:20px;border:1px solid #efefef;">
+			<div class="pure-g">
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+				{{> index/temai}} 
+
+			</div>	
+		</div>
+		
+		<!-- 右边品牌列表 -->
+		<div class="right-part" style="float:right;width:262px;">
+			123
+		</div>
+	</div>
+</div>
+<!-- 浮动栏 -->
+{{> common/floatbar}}  
+
+<!-- dashboard end -->
+<!-- footer start -->
+{{> common/footer}}
+<!-- footer stop -->
+{{/contentFor}}

@@ -1,0 +1,48 @@
+/*特卖*/
+.warp_spe_sell{
+    width: 385px;
+    height: 305px;
+    padding: 10px;
+    position: relative;
+}
+.warp_spe_sell .picpart{
+    width: 385px;
+    height: 245px;
+    position: relative;
+}
+.picpart img{
+    width: 385px;
+}
+
+.warp_spe_sell .despart{
+    width: 100%;
+    height: 40px;
+    padding: 10px 0;    
+    position: relative;
+}
+.warp_spe_sell ul{
+    list-style: none;
+    position: relative;
+}
+.warp_spe_sell ul li{
+    position: absolute;
+}
+.warp_spe_sell .title1{
+    font-family: "Microsoft Yahei","微软雅黑";
+    font-size: 12px;
+    right: 0;
+    top:-5px;
+}
+.warp_spe_sell .title2{
+    font-family: "Microsoft Yahei","微软雅黑";
+    font-size: 14px;
+    right: 0;
+    top:21px;
+}
+.warp_spe_sell .title3{
+    left: 0;
+    top:-10px;
+}
+.warp_spe_sell .title3 img{
+    height: 62px;
+}

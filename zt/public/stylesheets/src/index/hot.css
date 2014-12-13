@@ -1,0 +1,27 @@
+.hotwarp{
+    width: 260px;
+    height: 350px;
+    padding-right: 20px;
+    position: relative;
+}
+.hotwarp .hot{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.hotwarp .hot ul{
+    list-style: none;
+    position: relative;
+}
+.hotwarp .hot ul li{
+    position: absolute;
+}
+.hotwarp .hot .title1{
+    font-family: font-family: "Microsoft Yahei","微软雅黑";
+    font-size: 26px;
+    font-weight: bold;
+}
+.hotwarp .hot .title2{
+    font-family: '黑体';
+    font-size: 36px;
+}
