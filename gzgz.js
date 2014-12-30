@@ -24,6 +24,7 @@
 			if(!$('#gzmenu').length) $('body').append(gzmenu);
 			creatstyle('gzgzgz',function(gzgzgz){
 				gzgzgz.text('#gzmenu{position:absolute;width:150px;background-color:#fff;display:none;border:1px solid #666;border-bottom-width:0;}\
+							#gzmenu ul{}\
 							#gzmenu li{list-style:none;text-indent:1em;}\
 							#gzmenu li {display:block;height:30px;line-height:30px;border-bottom:1px solid #666;text-decoration:none;color:#666;font:12px/30px tahoma;}\
 							#gzmenu li:hover{background:#eee;color:black;} ');
@@ -94,14 +95,14 @@
 					
 					if(this.className.indexOf('remove')>-1){
 						$(opdiv.div).remove();
+						__remove(opdiv.idindex);
 					}
 					if(this.className.indexOf('clone')>-1){
 						var clone = opdiv.div.cloneNode(true);
 						$(clone).attr('idindex',idindex);
 						$(opdiv.container).append(clone);
 						new _unitDiv(clone,opdiv.container);
-						_wangs.put(idindex, clone);
-						idindex++;
+						__put(clone);						
 						msg_box('show','clone ok',1000);
 					}				
 				});				
@@ -113,16 +114,15 @@
 	var preCreatSubDiv = function(item,container,type){
 		var 
 		rect = __getRect(item),
-		crect = __getRect(container);
+		crect = __getRect(container);		
 		var position;			
 		(type=='float') ? position = 'float:left;' : position = 'position:absolute;';
 		var rzunit = '<div class="rzunit" style="cursor:nw-resize;width:7px;height:7px;background-color:red;position:absolute;bottom:-3px;right:-3px;font-size:0;">1</div>';
 		$(container).append('<div idindex="'+idindex+'" class="wangwang" style="z-index:1000;left:'+(rect.left-crect.left)+'px;top:'+(rect.top-crect.top)+'px;background-color:green;width:'+rect.width+'px;height:'+rect.height+'px;'+position+'">'+rzunit+'</div>');		
 		var _unit = $('div[idindex='+idindex+']')[0];
-		_wangs.put(idindex, _unit);
+		__put(_unit);
 		new _unitDiv(_unit,container);
-		console.log(_wangs.size());
-		idindex++;
+		// console.log(_wangs.size());
 	}	
 
 
@@ -148,6 +148,7 @@
 			_crect = __getRect(container);
 			
 			var that = this;
+			that.idindex = $(item).attr('idindex');			
 			that.type = 'absolute';
 			that.div = _unit = item;
 			that.container = container;
@@ -183,8 +184,7 @@
 						tt.appendChild(clone);
 						$('body').data('cloneunit',null);
 						new _unitDiv(clone,tt);
-						_wangs.put(idindex, _unit);
-						idindex++;
+						__put(_unit);						
 					}
 				}
 			});
@@ -246,7 +246,7 @@
 		dataclone : function (item){
 			var key = $(item).attr('idindex');
 			$(item).remove();
-			_wangs.remove(key);
+			__remove(key);
 			$('body').data('cloneunit',item);	
 			return;
 		},		
@@ -259,7 +259,7 @@
 		}
 	}
 
-	var creatstyle=function(name,callback){
+	var creatstyle=function(name,cb){
     	var nstyle ;
     	if(!$('#'+name).length){
     		nstyle = $('<style type="text/css" id="'+name+'"></style>');	    	
@@ -267,7 +267,7 @@
     	}else{
     		nstyle = $('#'+name);
     	}
-		if(callback) callback.call(this,nstyle);
+		cb && cb.call(this,nstyle);
 	}
 
 	var CurrentStyle = function(element){
@@ -290,11 +290,32 @@
       offset.height= $(element).height();
       return offset;
     };
+
+    //stack opration
+    var __put = function(unit){
+    	var obj = {
+    		'id'    : $(unit).attr('idindex'),
+    		'class' : unit.className,
+    		'css'   : (function(){  var ncss,css; ncss = (css = unit.style.cssText.toLowerCase()).lastIndexOf(';')<(css.length-1) ? css+';' : css; return ncss;})(),
+    		'unit'  : unit.outerHTML,
+    		'location': window.location.href
+    	};
+    	_wangs.put(idindex,obj);
+    	idindex++;
+    	__pjajax({'url':'/add','data':obj},function(json){
+            console.log(json);
+        });		
+    }
+    var __get = function(id){
+    	return _wangs.get(id);
+    }
+    var __remove =function(id){
+    	_wangs.remove(id);
+    }
     /* 2007-11-28 XuJian */  
     //截取字符串 包含中文处理  
     //(串,长度,增加...)  
-    var _subString = function(str, len, hasDot)  
-    {  
+    var _subString = function(str, len, hasDot) {  
         var newLength = 0;  
         var newStr = "";  
         var chineseRegex = /[^\x00-\xff]/g;  
@@ -310,6 +331,25 @@
         }
         if(hasDot && strLength > len) newStr += "...";
         return newStr;  
+    }    
+
+    //post ajax
+    var __pjajax = function(obj,callback){
+    	var data = __obj2str(obj.data);
+        $.ajax({
+            url: obj.url,
+            dataType: "json",
+            data: data,
+            type: "POST",
+            success: function (ajaxobj) {
+                if(callback)callback.call(this,ajaxobj,'success');
+                return false;
+            },
+            error: function (ajaxobj) {       
+                if(callback)callback.call(this,ajaxobj,'error');
+                return false;
+            }
+        });        
     }
 
 
@@ -395,23 +435,24 @@
             }  
         };            
         this.toString = function () {  
-            return obj2str(entry);  
-        };            
-        function obj2str(o) {  
-            var r = [];  
-            if (typeof o == "string")  
-                return "\"" + o.replace(/([\'\"\\])/g, "\\$1").replace(/(\n)/g, "\\n").replace(/(\r)/g, "\\r").replace(/(\t)/g, "\\t") + "\"";  
-            if (typeof o == "object") {  
-                for (var i in o)  
-                    r.push("\"" + i + "\":" + obj2str(o[i]));  
-                if (!!document.all && !/^\n?function\s*toString\(\)\s*\{\n?\s*\[native code\]\n?\s*\}\n?\s*$/.test(o.toString)) {  
-                    r.push("toString:" + o.toString.toString());  
-                }  
-                r = "{" + r.join() + "}";  
-                return r;  
-            }  
-            return o.toString();  
-        }  
+            return __obj2str(entry);  
+        };    
+        __obj2str = function (o) {  
+	        var r = [];  
+	        if (typeof o == "string")  
+	            return "\"" + o.replace(/([\'\"\\])/g, "\\$1").replace(/(\n)/g, "\\n").replace(/(\r)/g, "\\r").replace(/(\t)/g, "\\t") + "\"";  
+	        if (typeof o == "object") {  
+	            for (var i in o)  
+	                r.push("\"" + i + "\":" + __obj2str(o[i]));  
+	            if (!!document.all && !/^\n?function\s*toString\(\)\s*\{\n?\s*\[native code\]\n?\s*\}\n?\s*$/.test(o.toString)) {  
+	                r.push("toString:" + o.toString.toString());  
+	            }  
+	            r = "{" + r.join() + "}";  
+	            return r;  
+	        }  
+	        return o.toString();  
+	    }        
+        
     } 
 
 	$.fn.gzgz = function(){
@@ -425,9 +466,8 @@
 
 
 $(function(){
-	$('.gzgz').gzgz();
-	
-	// $(window).bind('beforeunload',function(){ return 'ggggggggggg';});
+	$('.gzgz').gzgz();	
+	// $(window).bind('beforeunload',function(){ return 'ggggggggggg';}); 
 });
 
  
