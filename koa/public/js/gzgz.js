@@ -4,15 +4,16 @@
 
 (function(){	
 
-	var Class = {create: function() {  return function() {this.initialize.apply(this, arguments);} } }
+	var Class = {create: function(item) {  return function() {this.initialize.apply(this, arguments);} } }
 	var pendraw = false;
-	var idindex = 0;
+	typeof idindex =='undefined' ? idindex=0 : idindex=idindex;
+	console.log(idindex);
 
 	var _wangs = new HashMap();
 	
     var gzgz = Class.create(); 
     gzgz.prototype = {
-	    initialize: function(item) {
+	    initialize: function(item) {	    	
 	    	this._body = $('body');
 	    	if(!$('#drawselect').length)
 	    		$('body').append("<span id='drawselect' title='右键编辑' style='z-index:1001;position:absolute;left:0;top:0;display:none;'></span>");	
@@ -36,7 +37,7 @@
 	    	_pen = this._pen,
 	    	_body = this._body;
 
-	    	this.length = item.length;	    	
+	    	this.length = item.length;
 
 	    	for(var i=0;i<item.length;i++)
 	    		{ item[i].setAttribute('gzindex',i); this._gzs.push(item[i]); }
@@ -45,6 +46,10 @@
 	    		var thegz = this;
 	    		var thegzrect = __getRect(this);
 	    		var pos = {};
+
+	    		$(thegz).children('.wangwang').each(function(){
+	    			new _unitDiv(this,thegz);
+	    		});
 	    		
 	    		$(_pen)
 	    			.on('mousedown',function(e){
@@ -102,7 +107,7 @@
 						$(clone).attr('idindex',idindex);
 						$(opdiv.container).append(clone);
 						new _unitDiv(clone,opdiv.container);
-						__put(clone);						
+						__put(clone);
 						msg_box('show','clone ok',1000);
 					}				
 				});				
@@ -259,7 +264,7 @@
 		}
 	}
 
-	var creatstyle=function(name,callback){
+	var creatstyle=function(name,cb){
     	var nstyle ;
     	if(!$('#'+name).length){
     		nstyle = $('<style type="text/css" id="'+name+'"></style>');	    	
@@ -267,7 +272,7 @@
     	}else{
     		nstyle = $('#'+name);
     	}
-		if(callback) callback.call(this,nstyle);
+		cb && cb.call(this,nstyle);
 	}
 
 	var CurrentStyle = function(element){
@@ -295,18 +300,19 @@
     var __put = function(unit){
     	var obj = {
     		'id'    : $(unit).attr('idindex'),
-    		'unit'  : unit.outerHTML,
     		'class' : unit.className,
-    		'css'   : (function(){  var ncss,css; ncss = (css = unit.style.cssText.toLowerCase()).lastIndexOf(';')<(css.length-1) ? css+';' : css; return ncss;})()    		
+    		'css'   : (function(){  var ncss,css; ncss = (css = unit.style.cssText.toLowerCase()).lastIndexOf(';')<(css.length-1) ? css+';' : css; return ncss;})(),
+    		'unit'  : unit.outerHTML,
+    		'location': window.location.href
     	};
     	_wangs.put(idindex,obj);
     	idindex++;
-    	__pjajax({'url':'/','data':obj},function(json){
+    	__pjajax({'url':'/add','data':obj},function(json){
             console.log(json);
         });		
     }
     var __get = function(id){
-    	return _wangs.put(id);
+    	return _wangs.get(id);
     }
     var __remove =function(id){
     	_wangs.remove(id);
@@ -339,7 +345,6 @@
             url: obj.url,
             dataType: "json",
             data: data,
-            // data: {'aaa':'bbb'},
             type: "POST",
             success: function (ajaxobj) {
                 if(callback)callback.call(this,ajaxobj,'success');
@@ -467,8 +472,7 @@
 
 $(function(){
 	$('.gzgz').gzgz();
-	
-	// $(window).bind('beforeunload',function(){ return 'ggggggggggg';});
+	// $(window).bind('beforeunload',function(){ return 'ggggggggggg';}); 
 });
 
  

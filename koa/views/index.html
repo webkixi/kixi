@@ -1,0 +1,42 @@
+<html>
+<head>
+  <title>Posts</title>
+  <style>
+    * {
+      padding: 0;
+      margin:0;
+    }    
+  </style>
+  
+<script type='text/javascript' src='js/jq183.js'></script>
+</head>
+<body>
+<script type='text/javascript' src='js/gzgz.js'></script>
+    
+<div class='outer' style="width:100%;height:auto;">
+    <div class='inner' style='width:1000px;margin:0 auto;height:auto;position:relative'>
+        <div class='gzgz' style='width:100%;height:500px;background-color:#333;'>
+            123
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+
+=================
+
+<script>	
+	bc(data[0]);
+	var looptpl='';
+	if(data && data.length>0){
+		for(var i=0; i<data.length; i++){
+			looptpl+=data[i].unit+'\n';
+		}
+	}
+	$('.gzgz').html(looptpl);
+	bjs('idindex='+data.length);
+
+</script>
