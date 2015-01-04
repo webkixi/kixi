@@ -4,6 +4,7 @@ var router = require('koa-router');
 var parse = require('co-body');
 var statics = require('koa-static-cache');
 var url = require('url');
+var exec = require('child_process').exec;
 
 var env = require('jsdom').env;
 var ssdb = require('ssdb');
@@ -29,7 +30,6 @@ var posts = [
 ,{id:3,title:'ni mei',content:'just your sister'}
 ];
 
-
 app
 .get('/',index)
 .get('/Index.js',index)
@@ -41,7 +41,8 @@ var __getClass = function(object){
 };
 
 function trim(s){
-    return s.replace(/(^\s*)|(\s*$)/g, '').replace(/\s+/g,' ');
+    // s.replace(/(\/\/)[^\n]*/g,'');
+    return s.replace(/(\/\/)[^\n]*/g,'').replace(/(^\s*)|(\s*$)/g, '').replace(/\s+/g,' ');
 }
 
 var hset = function(name,key,val){
@@ -56,15 +57,16 @@ var hget = function(name,key){
 	}
 }
 
-
 var tpl = function(tpl,data){	
 	return function(fn){
-		var tmp = tpl.split(/[=]{5,}/);
+		var tmp = tpl.split(/[=]{5,}/);			
 		var doc = tmp[0];
-		var head = [];
-		var jqstr = trim(tmp[1].replace(/<[\/|\s]?(script)>/g,''));
-		var browseconsoles = tmp[1].match(/bc\((.*?)\)[\;]?[\s]?/g);
-		var browseJs = tmp[1].match(/bjs\((.*?)\)[\;]?[\s]?/g);
+		var head = [];		
+
+		var jqstr = trim(tmp[1].replace(/<[\/]?(script)>/g,''));		
+		
+		var browseconsoles = jqstr.match(/bc\((.*?)\)[\;]?/g);
+		var browseJs = jqstr.match(/bjs\((.*?)\)[\;]?/g);			
 		jqstr = jqstr.replace(/bc\((.*?)\)[\;]?[\s]?/g,'');
 		jqstr = jqstr.replace(/bjs\((.*?)\)[\;]?[\s]?/g,'');
 
@@ -99,8 +101,9 @@ var tpl = function(tpl,data){
 			function bjs(){
 				var bjs = browseJs;
 				if(bjs&&bjs.length>0){
+					if(!browseconsoles) head.push('<script type="text/javascript">');
 					for(var i=0; i<bjs.length; i++){
-						var para = bjs[i].match(/\((.*)\)/);
+						var para = trim(bjs[i]).match(/\((.*)\)/);
 						if(para[0].indexOf("('")>-1){
 							if(para[1].indexOf('\'\+')>-1){
 								var pos = para[1].indexOf('\'+')
@@ -119,8 +122,8 @@ var tpl = function(tpl,data){
 			bc();
 			bjs();
 			doc = $('html').html();
-			head.push('</script>');
-			if(browseconsoles&&browseconsoles.length>0)doc = doc.replace('</head>',head.join('\n')+'\n</head>');
+			head.push('</script>');			
+			if(browseconsoles||browseJs)doc = doc.replace('</head>',head.join('\n')+'\n</head>');
 			fn(null,doc);
 		});
 	}
@@ -132,7 +135,6 @@ function *index(){
 	var data = [];
 	var size=0;
 	var exist = yield function(fn){sc.hexists(theme,'attr',fn);};
-	console.log(exist);
 	if(exist){
 		attr.push(yield hget(theme,'attr'));
 		size = yield function(fn){sc.hsize(theme+'_data',fn);};
@@ -162,10 +164,10 @@ function *add(){
 	path = url.parse(body.location).pathname.replace('/','').replace(/(\.[\w]+)/,'').toLowerCase(),
 	id   = 'id'+body.id;
 	body = JSON.stringify(body);
-	path = path==''?'index':path;		
+	path = path==''?'index':path;	
 
 	var exist = yield function(fn){sc.hexists(path,'attr',fn);};
-	if(exist){
+	if(exist){		
 		yield hset(path+'_data',id,body);
 	}else{
 		yield hset(path,'attr',JSON.stringify({'user':'xxx','passwd':'123456'}));
