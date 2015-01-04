@@ -30,14 +30,6 @@ var posts = [
 ];
 
 
-// var $, jQuery;
-// app.use(function *(){
-// 	win = yield function(fn){ env(tmp,fn);};
-// 	$ = jQuery = require('jquery')(win);
-// 	console.log($);
-// });
-
-
 app
 .get('/',index)
 .get('/Index.js',index)
@@ -140,6 +132,7 @@ function *index(){
 	var data = [];
 	var size=0;
 	var exist = yield function(fn){sc.hexists(theme,'attr',fn);};
+	console.log(exist);
 	if(exist){
 		attr.push(yield hget(theme,'attr'));
 		size = yield function(fn){sc.hsize(theme+'_data',fn);};
@@ -164,20 +157,20 @@ function *dealindex(){
  * @Schema  hset('index','attr',val) hset('index_data','0',val)
  */
 function *add(){	
-	// var 
-	// body = yield parse.json(this),
-	// path = url.parse(body.location).pathname.replace('/','').replace(/(\.[\w]+)/,'').toLowerCase(),
-	// id   = 'id'+body.id;
-	// body = JSON.stringify(body);
-	// path = path==''?'index':path;		
+	var 
+	body = yield parse.json(this),
+	path = url.parse(body.location).pathname.replace('/','').replace(/(\.[\w]+)/,'').toLowerCase(),
+	id   = 'id'+body.id;
+	body = JSON.stringify(body);
+	path = path==''?'index':path;		
 
-	// var exist = yield function(fn){sc.hexists(path,'attr',fn);};
-	// if(exist){
-	// 	yield hset(path+'_data',id,body);
-	// }else{
-	// 	yield hset(path,'attr',JSON.stringify({'user':'xxx','passwd':'123456'}));
-	// 	yield hset(path+'_data',id,body);
-	// }
+	var exist = yield function(fn){sc.hexists(path,'attr',fn);};
+	if(exist){
+		yield hset(path+'_data',id,body);
+	}else{
+		yield hset(path,'attr',JSON.stringify({'user':'xxx','passwd':'123456'}));
+		yield hset(path+'_data',id,body);
+	}
 	this.body = 'ok';
 }
 
