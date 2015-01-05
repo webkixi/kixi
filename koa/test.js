@@ -32,9 +32,10 @@ var posts = [
 
 app
 .get('/',index)
-.get('/Index.js',index)
+.get('/index.js',index)
 .post('/',dealindex)
-.post('/add',add);
+.post('/add',add)
+.post('/remove',remove);
 
 var __getClass = function(object){
     return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1];
@@ -54,6 +55,12 @@ var hset = function(name,key,val){
 var hget = function(name,key){
 	return function(fn){
 		sc.hget(name,key,fn);
+	}
+}
+
+var hdel = function(name,key){
+	return function(fn){
+		sc.hdel(name,key,fn);
 	}
 }
 
@@ -136,10 +143,12 @@ function *index(){
 	var size=0;
 	var exist = yield function(fn){sc.hexists(theme,'attr',fn);};
 	if(exist){
-		attr.push(yield hget(theme,'attr'));
-		size = yield function(fn){sc.hsize(theme+'_data',fn);};
-		for(var i=0; i<size; i++){
-			data.push(JSON.parse(yield hget(theme+'_data','id'+i)));
+		attr.push(yield hget(theme,'attr'));		
+		var all = yield function(fn){sc.hgetall(theme+'_data',fn);};		
+		for(var i=1; i<all.length; i=i+2){
+			var dataitem = all[i];
+			if(dataitem)
+				data.push(JSON.parse(dataitem));
 		}
 		var tmp = yield render('index');	
 		var kkk = yield tpl(tmp,data);
@@ -173,6 +182,24 @@ function *add(){
 		yield hset(path,'attr',JSON.stringify({'user':'xxx','passwd':'123456'}));
 		yield hset(path+'_data',id,body);
 	}
+	this.body = 'ok';
+}
+
+/**
+ * [*remove delete ssdb xxx_data data]
+ * @Schema  hdel('index','attr',val) hdel('index_data','0',val)
+ */
+function *remove(){
+	var 
+	body = yield parse.json(this),
+	path = url.parse(body.location).pathname.replace('/','').replace(/(\.[\w]+)/,'').toLowerCase(),
+	path = path==''?'index':path;	
+	id   = 'id'+body.id;
+
+	var exist = yield function(fn){sc.hexists(path+'_data',id,fn);};
+	if(exist){		
+		yield hdel(path+'_data',id);
+	}	
 	this.body = 'ok';
 }
 

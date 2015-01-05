@@ -47,7 +47,8 @@
 	    		var thegzrect = __getRect(this);
 	    		var pos = {};
 
-	    		$(thegz).children('.wangwang').each(function(){
+	    		$(thegz).children('.wangwang').each(function(){	    			
+			    	__put(this);
 	    			new _unitDiv(this,thegz);
 	    		});
 	    		
@@ -98,8 +99,8 @@
 					e=e||arguments[0];
 					e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
 					
-					if(this.className.indexOf('remove')>-1){
-						$(opdiv.div).remove();
+					if(this.className.indexOf('remove')>-1){						
+						// $(opdiv.div).remove();
 						__remove(opdiv.idindex);
 					}
 					if(this.className.indexOf('clone')>-1){
@@ -262,7 +263,7 @@
 			var rightmenu = $('#gzmenu');
 			rightmenu.css({'display':'block','left':e.pageX-5+'px','top':e.pageY-5+'px','z-index':9999});			
 		}
-	}
+	}//end unit
 
 	var creatstyle=function(name,cb){
     	var nstyle ;
@@ -305,9 +306,10 @@
     		'unit'  : unit.outerHTML,
     		'location': window.location.href
     	};
-    	_wangs.put(idindex,obj);
+    	_wangs.put(obj.id,obj);
     	idindex++;
-    	__pjajax({'url':'/add','data':obj},function(json){
+    	__pjajax({'url':'/add','data':obj},function(json,stat){
+    		if(stat=='error') return;
             console.log(json);
         });		
     }
@@ -315,7 +317,12 @@
     	return _wangs.get(id);
     }
     var __remove =function(id){
-    	_wangs.remove(id);
+    	var obj = __get(id);
+		__pjajax({'url':'/remove','data':obj},function(json,stat){
+			if(json.responseText!=='ok') return;
+            $(opdiv.div).remove();
+	    	_wangs.remove(id);
+        });
     }
     /* 2007-11-28 XuJian */  
     //截取字符串 包含中文处理  
@@ -348,11 +355,9 @@
             type: "POST",
             success: function (ajaxobj) {
                 if(callback)callback.call(this,ajaxobj,'success');
-                return false;
             },
             error: function (ajaxobj) {       
                 if(callback)callback.call(this,ajaxobj,'error');
-                return false;
             }
         });        
     }
@@ -377,14 +382,17 @@
         };           
         this.get = function (key) {  
         	var nkey = md5(key);
-            return entry[nkey];
+        	if(entry[nkey])
+            	return entry[nkey];
         };            
         this.remove = function (key) {  
         	var nkey = md5(key);
-            if (size == 0)  
-                return;  
-            delete entry[nkey];  
-            size--;  
+            if(entry[nkey]){
+	            if (size == 0)  
+	                return;  
+	            delete entry[nkey];  
+	            size--;  
+        	}
         };          
         this.containsKey = function (key) {  
         	var nkey = md5(key);
