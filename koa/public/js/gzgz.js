@@ -59,7 +59,7 @@
 	    			});
 	    		
 	    		$(document)
-		    		.on('mousedown',function(e){
+		    		.mousedown(function(e){
 		    			e = e||arguments[0];
 		    			if(e.target == thegz) {
 			    			pendraw = true;		    			
@@ -72,7 +72,8 @@
 						}
 						$('#gzmenu').hide();
 						_pen.html('');
-		    		}).on('mousemove',function(e){
+		    		})
+		    		.mousemove(function(e){
 						e=e||arguments[0];
 						if(e.which==1&&pendraw){
 							if(e.pageX<thegzrect.left){
@@ -83,7 +84,8 @@
 								_pen.html('<div style="position:absolute;top:48%;left:41%;">agzgz.com</div>');
 		    				}
 						}						
-					}).on('mouseup',function(e){
+					})
+					.mouseup(function(e){
 						e = e||arguments[0];
 						pendraw = false;  //					
 
@@ -95,12 +97,11 @@
 					});	
 
 				// $('#gzmenu ul li').on('mousedown',function(){
-				$('#gzmenu ul li').on('mousedown',function(e){
+				$('#gzmenu ul li').mousedown(function(e){
 					e=e||arguments[0];
 					e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
 					
 					if(this.className.indexOf('remove')>-1){						
-						// $(opdiv.div).remove();
 						__remove(opdiv.idindex);
 					}
 					if(this.className.indexOf('clone')>-1){
@@ -136,8 +137,8 @@
 	_nrect,
 	_rzrect, 
 	_rzobj, 
-	_rzaction=false,
-	unitdrag = false,
+	_rzaction=false,  //drga item  to resize wangwang
+	unitdrag = false,   //
 	cloneunit = false,
 	tt,
 	opdiv;  //use for clone, remove
@@ -145,7 +146,6 @@
 	var 
 	_unitDiv = Class.create();
 	_unitDiv.prototype = {
-		// initialize: function(item,container,type) {			
 		initialize: function(item,container) {			
 			var theunit;
 			var _unit;
@@ -236,8 +236,9 @@
 				e = e||arguments[0];
 				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
 				_rzaction = false;   
-				that.div.style.zIndex = 1000;
-				if(unitdrag&&e.ctrlKey){					
+				that.div.style.zIndex = 1000;				
+				if(unitdrag&&e.ctrlKey){
+					__move(that);			
 					if(e.altKey) {
 						var ounit = e.target;						
 						cloneunit = true;				
@@ -315,6 +316,13 @@
     }
     var __get = function(id){
     	return _wangs.get(id);
+    }
+    var __move =function(item){
+    	if(!item)return false;
+    	var opdiv = item;
+    	var nowrect = __getRect(opdiv.div);
+    	var obj = __get(opdiv.idindex);
+    	console.log(obj.css);
     }
     var __remove =function(id){
     	var obj = __get(id);
