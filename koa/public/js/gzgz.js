@@ -93,7 +93,7 @@
 							kkk = e.ctrlKey ? new preCreatSubDiv(_pen,thegz,'float') : new preCreatSubDiv(_pen,thegz);
 						}else if(_pen.width()>3&&_pen.height()>3)
 							msg_box('show','最小30x30',1000);						
-						pos = {};
+						pos = {};						
 					});	
 
 				// $('#gzmenu ul li').on('mousedown',function(){
@@ -124,13 +124,28 @@
 		crect = __getRect(container);		
 		var position;			
 		(type=='float') ? position = 'float:left;' : position = 'position:absolute;';
-		var rzunit = '<div class="rzunit" style="cursor:nw-resize;width:7px;height:7px;background-color:red;position:absolute;bottom:-3px;right:-3px;font-size:0;">1</div>';
+		var rzunit = '<div class="rzunit" >1</div>';
 		$(container).append('<div idindex="'+idindex+'" class="wangwang" style="z-index:1000;left:'+(rect.left-crect.left)+'px;top:'+(rect.top-crect.top)+'px;background-color:green;width:'+rect.width+'px;height:'+rect.height+'px;'+position+'">'+rzunit+'</div>');		
 		var _unit = $('div[idindex='+idindex+']')[0];
 		__put(_unit);
 		new _unitDiv(_unit,container);
 		// console.log(_wangs.size());
 	}	
+
+	$(document).mousemove(function(e){
+		e = e||arguments[0];
+		if(e.which==1&&_rzaction===true){
+			$(_rzobj.div).css({'width':e.pageX-_rzrect.left,'height':e.pageY-_rzrect.top});
+		}
+	});
+
+	$(document).mouseup(function(e){
+		e = e||arguments[0];
+		if(e.which==1&&_rzaction===true){
+			_rzaction = false;			
+			__edit(_rzobj);
+		}
+	});	
 
 
 	var 
@@ -164,15 +179,9 @@
 				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
 				_rzaction=true;
 				_rzrect = __getRect(this.parentNode);
-				_rzobj = this.parentNode;
-			});
-
-			$(document).mousemove(function(e){
-				e = e||arguments[0];
-				if(e.which==1&&_rzaction===true){
-					$(_rzobj).css({'width':e.pageX-_rzrect.left,'height':e.pageY-_rzrect.top});
-				}
-			});
+				// _rzobj = this.parentNode;
+				_rzobj = that;
+			});					
 			
 			$(_unit).mouseover(function(e){						
 				e = e||arguments[0];				
@@ -184,8 +193,8 @@
 						clone.style.left = null;
 						clone.style.top = null;
 						$(clone)
-						.css({'position':'absolute','background-color':'red','left':0,'top':0})
-						.attr('idindex',idindex);						 
+							.css({'position':'absolute','background-color':'red','left':0,'top':0})
+							.attr('idindex',idindex);						 
 						tt = e.target;						
 						tt.appendChild(clone);
 						$('body').data('cloneunit',null);
@@ -199,7 +208,7 @@
 			$(_unit).mousedown(function(e){	
 				_rect = __getRect(item),
 				_crect = __getRect(container);
-				e = e||arguments[0];
+				e = e||arguments[0];				
 				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
 				$(this).css('z-index',2000);
 				unitdrag   = true;
@@ -235,10 +244,11 @@
 			$(_unit).mouseup(function(e){
 				e = e||arguments[0];
 				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
-				_rzaction = false;   
-				that.div.style.zIndex = 1000;				
+				// _rzaction = false;   
+				that.div.style.zIndex = 1000;			
 				if(unitdrag&&e.ctrlKey){
-					__move(that);			
+					that.move = {"left":that.div.style.left,"top":that.div.style.top}
+					__move(that);
 					if(e.altKey) {
 						var ounit = e.target;						
 						cloneunit = true;				
@@ -277,6 +287,57 @@
 		cb && cb.call(this,nstyle);
 	}
 
+	msg_box = function(show,msg,timeout){
+		console.log('aaaaaaaaaaa');
+		var msg_left, msg_top;
+		var docRect = _measurePopPos();
+		var sl = docRect.sl;
+		var st = docRect.st;
+		var cw = docRect.dw;
+		var ch = docRect.dh;
+		var flymsg;
+
+		timeout = timeout ? timeout : 17;
+
+		// !$('.showmsg').length ? $("body").append("<div class='showmsg yuanjiao2 yinying2' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>") : '';
+		// $("body").append("<div class='showmsg yuanjiao2 yinying2' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>");
+		var msgitem = $("<div class='showmsg yuanjiao2 yinying2'>请稍候。。。</div>");
+		flymsg = msgitem;	
+
+		if(typeof(msg)=='undefined') msg = "请稍候。。。";
+		// flymsg[0].style.opacity = 1;
+		flymsg.html(msg);
+		flymsg[0].style.cssText = 'z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;';
+		
+		//position:absolute
+		// msg_left = sl + Math.round((parseInt(cw)-$("#showmsg").width())/2);			
+		// msg_top = st+Math.round((parseInt(ch)-50)/2);	
+		//position:fixed			
+		var msgct = __getRect(flymsg[0]);
+		console.log(msgct);
+		msg_left = Math.round((parseInt(cw)-msgct.width)/2);			
+		msg_top  = Math.round((parseInt(ch)-msgct.height)/2);
+		flymsg.css({"left":msg_left,"top":msg_top,"opacity":1});
+		// flymsg[0].style.left = msg_left+'px';
+		// flymsg[0].style.top = msg_top+'px';
+		flymsg.show().animate({top:0},600).delay(1000).fadeOut('slow');
+
+		// if(show == "show"){			
+		// 	setTimeout(function(){$('#showmsg').show().animate({top:0},400).delay(1000).fadeOut('slow')},timeout);
+		// }
+		// else if(show == "hide"){
+		// 	if(typeof(msg)=='undefined') msg = "拖放完成";
+		// 	$("#showmsg")[0].innerHTML = msg;
+		// 	setTimeout(function(){$('#showmsg').animate({top:0,opacity:'0'},200)},1000);
+		// }else{			
+		// 	$("#showmsg")[0].style.opacity = 1;
+		// 	$("#showmsg")[0].innerHTML = show;
+		// 	setTimeout(function(){$('#showmsg').animate({top:0,opacity:'0'},200)},1500);
+		// }
+
+		
+	}
+
 	var CurrentStyle = function(element){
 	    return element.currentStyle || document.defaultView.getComputedStyle(element, null);
 	};
@@ -311,19 +372,52 @@
     	idindex++;
     	__pjajax({'url':'/add','data':obj},function(json,stat){
     		if(stat=='error') return;
-            console.log(json);
         });		
     }
+
     var __get = function(id){
     	return _wangs.get(id);
     }
-    var __move =function(item){
+
+    var __edit =function(item){    	
     	if(!item)return false;
     	var opdiv = item;
     	var nowrect = __getRect(opdiv.div);
     	var obj = __get(opdiv.idindex);
-    	console.log(obj.css);
+    	opdiv.div.style.width = nowrect.width;
+    	opdiv.div.style.height = nowrect.height;
+    	obj.css = opdiv.div.style.cssText.toLowerCase();
+    	obj.unit = opdiv.div.outerHTML;
+    	__pjajax({'url':'/edit','data':obj},function(json,stat){
+			if(json.responseText!=='ok')
+				alert('edit faile');
+        });
     }
+
+    var __move =function(item){    	
+    	if(!item)return false;
+    	var opdiv = item;
+    	var nowrect = opdiv.move;
+    	var obj = __get(opdiv.idindex);
+    	opdiv.div.style.left = nowrect.left;
+    	opdiv.div.style.top = nowrect.top;    	
+    	obj.css = opdiv.div.style.cssText.toLowerCase();
+    	obj.unit = opdiv.div.outerHTML;
+    	__pjajax({'url':'/move','data':obj},function(json,stat){
+			if(json.responseText!=='ok') 
+				alert('move faile');
+        });
+    }
+
+    var __clone =function(id){
+    	var obj = __get(id);
+		__pjajax({'url':'/remove','data':obj},function(json,stat){
+			if(json.responseText!=='ok') return;
+            $(opdiv.div).remove();
+	    	_wangs.remove(id);
+        });
+    }
+
     var __remove =function(id){
     	var obj = __get(id);
 		__pjajax({'url':'/remove','data':obj},function(json,stat){

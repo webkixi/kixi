@@ -6,12 +6,18 @@ var statics = require('koa-static-cache');
 var url = require('url');
 var exec = require('child_process').exec;
 
-var env = require('jsdom').env;
+var jsdom = require('jsdom');
+var env = jsdom.env;
+var jsd = jsdom.jsdom;
+var jq = require('jquery');
+var $,jQuery,$$;
+// var doc = jsd('');
+// var win = doc.parentWindow;
+// $$ = jq(win);
+
 var ssdb = require('ssdb');
 var sc = ssdb.createClient();
 
-var jq = require('jquery');
-var $,jQuery;
 
 // var fs = require('fs');
 // var ws = fs.createWriteStream('message.txt');
@@ -35,7 +41,9 @@ app
 .get('/index.js',index)
 .post('/',dealindex)
 .post('/add',add)
-.post('/remove',remove);
+.post('/remove',remove)
+.post('/move',move)
+.post('/edit',edit);
 
 var __getClass = function(object){
     return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1];
@@ -141,14 +149,16 @@ function *index(){
 	var attr = [];
 	var data = [];
 	var size=0;
+	var i,v;
 	var exist = yield function(fn){sc.hexists(theme,'attr',fn);};
 	if(exist){
 		attr.push(yield hget(theme,'attr'));		
-		var all = yield function(fn){sc.hgetall(theme+'_data',fn);};		
+		var all = yield function(fn){sc.hgetall(theme+'_data',fn);};
 		for(var i=1; i<all.length; i=i+2){
 			var dataitem = all[i];
-			if(dataitem)
+			if(dataitem){
 				data.push(JSON.parse(dataitem));
+			}
 		}
 		var tmp = yield render('index');	
 		var kkk = yield tpl(tmp,data);
@@ -168,12 +178,12 @@ function *dealindex(){
  * @Schema  hset('index','attr',val) hset('index_data','0',val)
  */
 function *add(){	
+	var body = yield parse.json(this);
 	var 
-	body = yield parse.json(this),
 	path = url.parse(body.location).pathname.replace('/','').replace(/(\.[\w]+)/,'').toLowerCase(),
 	id   = 'id'+body.id;
 	body = JSON.stringify(body);
-	path = path==''?'index':path;	
+	path = path==''?'index':path;
 
 	var exist = yield function(fn){sc.hexists(path,'attr',fn);};
 	if(exist){		
@@ -200,6 +210,48 @@ function *remove(){
 	if(exist){		
 		yield hdel(path+'_data',id);
 	}	
+	this.body = 'ok';
+}
+
+/**
+ * [*move move the unit and save the unit propty into ssdb]
+ * @Schema  hdel('index','attr',val) hdel('index_data','0',val)
+ */
+function *move(){
+	var 
+	body = yield parse.json(this),
+	path = url.parse(body.location).pathname.replace('/','').replace(/(\.[\w]+)/,'').toLowerCase(),
+	path = path==''?'index':path;
+	id   = 'id'+body.id;
+	body = JSON.stringify(body);
+
+	var exist = yield function(fn){sc.hexists(path+'_data',id,fn);};
+	if(exist){	
+		var old = yield hget(path+'_data',id);
+		yield hdel(path+'_data',id);
+		yield hset(path+'_data',id,body);
+	}
+	this.body = 'ok';
+}
+
+/**
+ * [*edit rebuild the unit and save the unit propty into ssdb]
+ * @Schema  hdel('index','attr',val) hdel('index_data','0',val)
+ */
+function *edit(){
+	var 
+	body = yield parse.json(this),
+	path = url.parse(body.location).pathname.replace('/','').replace(/(\.[\w]+)/,'').toLowerCase(),
+	path = path==''?'index':path;
+	id   = 'id'+body.id;
+	body = JSON.stringify(body);
+
+	var exist = yield function(fn){sc.hexists(path+'_data',id,fn);};
+	if(exist){	
+		var old = yield hget(path+'_data',id);
+		yield hdel(path+'_data',id);
+		yield hset(path+'_data',id,body);
+	}
 	this.body = 'ok';
 }
 
