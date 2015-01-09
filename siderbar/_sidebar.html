@@ -1,0 +1,398 @@
+<!-- 侧边栏 -->
+<?php // $CLOSE_ADDCART＝1表示关闭销售和评论功能 ?>
+<style type="text/css">
+    .cart_has_bg{
+        background-color: #88495b;
+    }
+    .fly_item { border: 2px solid #B30000; width: 36px; height: 36px; overflow: hidden; position: absolute; visibility: hidden; opacity: .8; filter: alpha(opacity=80); z-index: 9999;}
+</style>
+<div {if $CLOSE_ADDCART eq 1}style="display: none;"{else}class="slidebar" style="display: none;"{/if}>
+  <div class="fix_area1">
+    <ul>
+      <li>
+        <!-- 登陆状态 btn-->
+        <a class="btn">
+          <span class="user"></span>
+        </a>
+        <ul class='pop0 nologin'>
+          <li>
+             <img src="{$STATIC_ROOT}ve_2_1/css/img/member/head-f.jpg?_ve_201430"> <!---->
+            <span>您好，请先<a href="javascript:login();" class='loginBtn' style="cursor: pointer;"><em class="red">登录 | </em></a> <a href="{url r="user#register"}#f=sidebar&md={$MODULE_NAME}" ><em class="red">注册</em></a></span>            
+          </li>
+        </ul>
+        <ul class='pop1'>
+          <li>
+            <img class='headpic' src="{$STATIC_ROOT}ve_2_1/css/img/member/head-f.jpg?_ve_201430" width="50">
+            <span>您好，<em class="red">~uu~</em></span>
+            <a href="{url r="uc_order"}#f=sidebar&md={$MODULE_NAME}"><img src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/user_dan.png?_ve_201430"></a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <!-- 优惠券 btn-->
+        <a class="sidebar dollar_box" style='width:100%;'>
+          <span class="dollar"></span>
+        </a>
+        <dl class="fix_child pop1">
+          <dt><span>我的优惠券</span><img class='closepng' src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/close.png?_ve_201430" /></dt>
+          ~data~
+          <dd><a href="{url r="uc_youhui#index" p="used=index"}#f=sidebar&md={$MODULE_NAME}">查看更多<img src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/point.png?_ve_201430" ></a></dd>
+        </dl>
+        <dl class="fix_child pop2 ">
+          <dt><span>我的优惠券</span><span class="closepng"></span></dt>
+          <dd><a class="bgno"></a></dd> 
+        </dl>
+        <ul class="pop0 nologin" >
+          <li>
+             <img src="{$STATIC_ROOT}ve_2_1/css/img/member/head-f.jpg?_ve_201430"> <!---->
+            <span>您好，请先<a href="javascript:login();" class='loginBtn' style="cursor: pointer;"><em class="red">登录 | </em></a> <a href="{url r="user#register"}#f=sidebar&md={$MODULE_NAME}" ><em class="red">注册</em></a></span>            
+          </li>
+        </ul>
+      </li>
+      <li>
+        <!-- 购物车 btn-->
+        <a class="sidebar car_box" style='width:100%;' data-interaction="global|sidebar|1|1">
+          <span id='ico_car' class="car"></span>
+          <span>购物车<em class="carnum">0</em></span>
+        </a>
+        <dl class="fix_child list pop1">
+          <dt class="clear"><span>购物车</span><img class='closepng' src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/close.png?_ve_201430" /></dt>
+          <dd class='fixbar-goods-all'>
+              
+          </dd>
+          <dd class="go-settenBtn"><a href="{url r="cart"}#f=sidebar&md={$MODULE_NAME}">结算 <img src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/point.png?_ve_201430" > </a></dd>
+        </dl>
+        <ol class="pop0" >
+          <li><a href="{url r="cart"}#f=sidebar&md={$MODULE_NAME}">查看购物车</a></li>
+        </ol>
+      </li> 
+    </ul>
+  </div>
+
+  <div class="fix_area2">
+        <ul> 
+      <li class="hover3">
+        <a class="btn">
+         <span class="lian"></span>
+        </a>
+        <ol class="pop0">
+          <li><a>联系客服</a></li>
+        </ol>
+        <ul class="pop1 kefu">
+          <li class="kefu-tit"><strong>联系客服</strong><!-- <img src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/close.png?_ve_201430" /> --></li>
+          <li class="kefu-center">
+            <div class="kefu1_box">
+              <a class="kf-itemLink" onclick="window.open('http://v2.live800.com/live800/chatClient/chatbox.jsp?companyID=457738&jid=3221650122&skillId=6642', 'newwindow', 'height=540, width=800, top=0,left=0, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no')" href="javascript:;" ><i>在线咨询</i></a>
+              <a class="kf-itemLink" onclick="window.open('http://v2.live800.com/live800/chatClient/chatbox.jsp?companyID=457738&jid=3221650122&skillId=6643', 'newwindow', 'height=540, width=800, top=0,left=0, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no')" href="javascript:;" ><i>售后服务</i></a>
+            </div>
+            <a href="mailto:service@ve.cn" class="kefu2_box">
+              <span class="kefu2"></span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a class="btn">
+          <span class="qr_code"></span>
+        </a>
+        <ul class="weix pop0 pop1">
+          <li> 
+            <img src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/weix.png?_ve_201430">
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a class="gotop">
+          <!-- <img src="{$STATIC_ROOT}ve_2_1/css/img/sidebar/top.png?_ve_201430" /> -->
+          <span class="goto_top"></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+<!-- 侧边栏结束 -->
+
+<!-- 加入侧边栏购物车动画ele -->
+<div id="flyItem" class="fly_item"><img src="http://www.zhangxinxu.com/study/201312/item-pic.jpg" width="50" height="50" /></div>
+
+{if $CLOSE_SALE eq 1}
+<?php // $CLOSE_SALE＝1表示关闭销售和评论功能 ?>
+{else}
+
+<script type="text/javascript">
+$('body').click(function(e){    
+      $('#fixpop').hide();
+  }); 
+$('body').delegate('#fixpop','click',function(e){
+    e=e||arguments[0];
+    e.stopPropagation();
+});
+
+$(function(){
+    var src = $('.product-small .small-pic img').attr('src');    
+    $('#flyItem img').attr('src',src);
+});
+
+require(['common/easy_login','sidebar/parabola','sidebar/vefixbar','global/g'],function(c,parabola,vefixbar,core){
+    Parabola = parabola.parabola;
+
+    //侧边栏动画
+    $('body').on('addtocart','',function(even,eve){        
+        if($(".slidebar")){
+            var eleFlyElement = document.getElementById('flyItem');
+            var eleShopCart   = document.getElementById('ico_car');        
+            var numberItem = 0;
+            var myParabola = Parabola(eleFlyElement, eleShopCart, {
+                speed: 900,
+                curvature: 0.0008,    
+                complete: function() {
+                    eleFlyElement.style.display = "none";
+                    eleFlyElement.style.visibility = "hidden";
+                    // $(eleShopCart).html(++numberItem);
+                    //from product.js
+                    window.add_to_cart_anim=0;  
+                    getJdata();
+                }
+            });
+
+            var scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+                scrollTop = document.documentElement.scrollTop || document.body.scrollTop || 0;
+            
+            // var e = event||window.event;
+            eleFlyElement.style.left = (eve.clientX + scrollLeft - 30) + "px";
+            eleFlyElement.style.top = (eve.clientY + scrollTop - 36) + "px";        
+            eleFlyElement.style.display = "block";
+            eleFlyElement.style.visibility = "visible";
+            // 需要重定位
+            myParabola.position().move();
+        }
+    });
+
+
+    // var AJAX_DELGOODS_URL='/ajax-delcart.html';    
+    var AJAX_DELGOODS_URL='/index.php?ctl=ajax&act=delcart';
+    window.login = function(){
+      c.ajax_login();
+    }
+    var aj = {
+        login:{
+          url  :'/',
+          data : {ctl:'ajax',act:'logininfo'}
+        }    
+    };
+    window.jdata; //返回数据
+    var loginstat; 
+    var nologin = '<ul> <li> <img src="http://s1.ve.cn/statics/ve_2_1/css/img/member/head-f.jpg?_ve_201430"> <span>您好，请先<a href="javascript:login();" class="loginBtn" style="cursor: pointer;"><em class="red">登陆</a> | </em> <a href="/user-register.html#f=sidebar&md=index" ><em class="red">注册</em></a></span> </li> </ul>';
+
+    //jdata数据联动，如购物车状态
+    $('body').bind('relevancyBehavior',function(){
+        if(jdata.cart_total_num>0){
+            $('.car_box').addClass('cart_has_bg');
+            $('#settlement_btn').show();
+        }
+        if(jdata.cart_total_num==0){
+            $('.car_box').removeClass('cart_has_bg');
+            $('#settlement_btn').hide();
+        }
+        
+        core.do_action('topcart');
+        
+        $('.carnum').text(jdata.cart_total_num);
+        $(".cart_flag_all em.cart-count").text(jdata.cart_total_num);
+    });
+
+    window.getJdata=function(){
+      core.init(this,{
+        jdata: {url:aj.login.url,data:aj.login.data }
+      },next);
+      function next(){
+        if(jdata){
+            loginstat = jdata.status;
+            jdata.cart_total_num < 0 ? jdata.cart_total_num = 0 : '';
+            $('body').trigger('relevancyBehavior');
+        }
+      }
+    }
+  
+
+    
+  window.dosidebar = function(){
+    $(".slidebar").show(300).vefixbar()  
+
+    .btn('.btn','',function(c){
+        var pop0,pop1;
+        $(this).mouseenter(function(){
+          i = $(this).attr('idindex');          
+          $(this).addClass('hover3');
+          pop0    = $(this.parentNode).children('.pop0').prop('outerHTML');         
+          pop1    = $(this.parentNode).children('.pop1').prop('outerHTML');
+         
+          if(!loginstat)
+              (i==1) ? $(c).html('<div class="popdiv">'+pop1+"</div>") : $(c).html('<div class="popdiv">'+pop0+"</div>");
+          else{
+              if(jdata&&jdata.user_info){
+                  (jdata.user_info.pic) ? hpic = jdata.user_info.pic : hpic="http://s1.ve.cn/statics/ve_2_1/css/img/member/head-f.jpg";                  
+                  $(c).html('<div class="popdiv">'+pop1.replace('~uu~',jdata.user_info.user_name).replace('~headpic~',hpic)+"</div>");                  
+                  $(c).find('img.headpic').attr('src',hpic);
+                  // $(c).html('<div class="popdiv">'+pop1.replace('~uu~',jdata.user_info.user_name);
+              }else
+                $(c).html('<div class="popdiv">'+pop1.replace('~uu~','唯一优品')+"</div>");
+          } 
+          
+        }).mouseleave(function(){
+          $(this).removeClass('hover3');
+        });
+    })
+
+    .btn('.sidebar','',function(c,fix){
+        if(jdata.cart_total_num>0)
+            $(this[1]).addClass('cart_has_bg');
+
+        var pop0,pop1;
+        var tmp_str='';        
+
+        var coupon_str = '<dd>\
+        <div style="display:block;position:relative;width:248px;height:106px;background:url(http://s1.ve.cn/statics/ve_2_1/css/img/sidebar/yhbg.png)">\
+          <div class="coupon_price"><span class="flag">￥</span><span class="num">{{coupon.value}}</span></div>\
+          <div class="coupon_des" style="color:#af6822;">满{{coupon.condition}}元使用</div>\
+          <div class="coupon_date" style="color:#af6822;">过期时间：{{coupon.valid_end_time}}</div>\
+        </div>\
+        </dd>';
+
+        var couponlist = function(obj){
+            tmp_str='';
+            if(jdata&&jdata.coupon&&jdata.coupon.length>0){                
+                for(var jj=0; jj<jdata.coupon.length; jj++){
+                  var coupon = jdata.coupon[jj];                  
+                  tmp_str += coupon_str.replace(/\{\{(.*?)}\}/gi,function(a,b){
+                      return eval(b);
+                  });
+                }
+                pop1 = $(obj.parentNode).children('.pop1').prop('outerHTML').replace(/\{\{(.*?)}\}/gi,function(a,b){
+                      return eval(b);
+                }).replace('~data~',tmp_str);
+            }else{
+                pop1 = $(obj.parentNode).children('.pop2').prop('outerHTML');
+            }
+        }        
+
+        $(this).mouseenter(function(){
+            var thebtn = this;
+            i = $(this).attr('idindex');
+            $(this).addClass('hover3');
+            pop0 = $(this.parentNode).children('.pop0').prop('outerHTML');
+
+            //默认hover弹出
+            if(i==1)
+                $(c).html('');
+            else{
+                loginstat ? $(c).html('') : $(c).html('<div class="popdiv">'+pop0+"</div>");
+            }
+
+            //优惠券初始化，购物车初始化
+            couponlist(thebtn);
+
+        }).mouseleave(function(){
+            $(this).removeClass('hover3');
+        });
+        
+        //购物车及优惠券打开，及打开后的动作        
+        $(this).on('click',function(e){
+            e=e||arguments[0];  e.stopPropagation();
+            var thebtn = this;
+            //优惠券初始化，购物车初始化
+            i = $(this).attr('idindex');
+
+            couponlist(thebtn);
+
+            if(i==1) pop1 = $(this).parent().find('.pop1').prop('outerHTML');
+
+            if(!loginstat){
+                if(i==1){
+                    setTimeout(setdraw,120);
+                    $(c).html('<div class="popdiv">'+pop1+"</div>");                    
+                }else
+                    $(c).html('<div class="popdiv">'+nologin+"</div>"); 
+            }else{
+                setTimeout(setdraw,120);
+                $(c).html('<div class="popdiv">'+pop1+"</div>");
+            }
+            // core.do_action('delgoods');
+            // setTimeout(function(){
+            //     core.do_action('delgoods');
+            // }, 300);
+        });
+
+        function setdraw(){
+            $(c).css('overflow-y','auto');
+            var doc = _measurePopPos();
+            $(c).stop().animate({'height':doc.dh,'top':0},150);
+        }
+
+        $(c).delegate('.closepng','click',function(){
+            $(c).css({'display':'none'});
+        });
+           
+    })  
+
+
+    .btn('.gotop','gotop',function(c){
+        $(this).mouseenter(function(){
+          i = $(this).attr('idindex');
+          $(this).addClass('hover3');          
+          $(c).html('<div style="padding:8px;border:1px solid #d3d3d3">返回顶部</div>');     
+        }).mouseleave(function(){
+          $(this).removeClass('hover3');
+        });        
+    })
+
+    .rsp({xs:'.fix_area1',sm:'fix_area2'})    
+
+    .fixed(function(){
+      var kkk = function(){
+        // var thefix = window.fixbar;
+        $('.carnum').html(jdata.cart_total_num);
+        clearTimeout(t)
+      }
+      var t = setTimeout(kkk,500);
+    });
+
+    $('#fixpop').bind("autohide", function (event) {
+        var that = this;
+        function autohide(){
+            $(that).hide();
+        }
+        $(this).mouseover(function(){
+            clearTimeout(hide_t);
+        });
+        var hide_t = setTimeout(autohide, 3000);
+    });
+
+    $('#fixpop').mouseout(function(){
+        //触发自动隐藏
+        $(this).trigger('autohide');
+    })
+
+}   
+
+    predosidebar=function(){
+        core.init(this,{
+            oridata: {url:aj.login.url,data:aj.login.data }
+        },start);
+        function start(){
+            jdata = oridata;
+            if(jdata){
+                loginstat = jdata.status;  
+                var ttt = setTimeout(function(){window.sbstat = 1; dosidebar(); },15);
+            }else{
+                predosidebar();
+            }
+        }
+    }
+
+    predosidebar();
+
+}); //require结束
+
+</script>
+{/if}
