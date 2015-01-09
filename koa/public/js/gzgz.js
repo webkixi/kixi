@@ -300,10 +300,10 @@
 		timeout = timeout ? timeout : 17;
 
 		// !$('.showmsg').length ? $("body").append("<div class='showmsg yuanjiao2 yinying2' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>") : '';
-		// $("body").append("<div class='showmsg yuanjiao2 yinying2' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>");
-		var msgitem = $("<div class='showmsg yuanjiao2 yinying2'>请稍候。。。</div>");
-		flymsg = msgitem;	
-
+		// var msgitem = $("<div class='showmsg yuanjiao2 yinying2'>请稍候。。。</div>");
+		// flymsg = msgitem;	
+		$("body").append("<div class='showmsg' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>");
+		flymsg = $('.showmsg');
 		if(typeof(msg)=='undefined') msg = "请稍候。。。";
 		// flymsg[0].style.opacity = 1;
 		flymsg.html(msg);
@@ -315,12 +315,13 @@
 		//position:fixed			
 		var msgct = __getRect(flymsg[0]);
 		console.log(msgct);
-		msg_left = Math.round((parseInt(cw)-msgct.width)/2);			
+		msg_left = Math.round((parseInt(cw)-msgct.width)/2);
 		msg_top  = Math.round((parseInt(ch)-msgct.height)/2);
 		flymsg.css({"left":msg_left,"top":msg_top,"opacity":1});
 		// flymsg[0].style.left = msg_left+'px';
 		// flymsg[0].style.top = msg_top+'px';
-		flymsg.show().animate({top:0},600).delay(1000).fadeOut('slow');
+		// flymsg.show().animate({top:0},600).delay(1000).fadeOut('slow');
+		flymsg.show().addClass('t6');
 
 		// if(show == "show"){			
 		// 	setTimeout(function(){$('#showmsg').show().animate({top:0},400).delay(1000).fadeOut('slow')},timeout);

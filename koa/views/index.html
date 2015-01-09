@@ -5,7 +5,24 @@
     * {
       padding: 0;
       margin:0;
-    }    
+    }
+    .wangwang>.rzunit{
+    	width:8px;
+    	height: 8px;
+    	position: absolute;
+    	bottom: 0px;
+    	right: 0px;
+    	cursor:nw-resize;
+    	font-size: 0;
+    	background-color: red;
+    }
+
+    .t6 {-webkit-animation:transform-6 1s ease 0s alternate none infinite;
+	-moz-animation:transform-6 1s ease 0s alternate none infinite;
+	animation:transform-6 1s ease 0s normal none 1; }
+	@-webkit-keyframes transform-6 { from{-webkit-transform:perspective(400px) rotateX(0deg); } to{-webkit-transform:perspective(400px) rotateX(360deg); } } 
+	@-moz-keyframes transform-6 { from{-moz-transform:perspective(400px) rotateX(0deg); } to{-moz-transform:perspective(400px) rotateX(360deg); } }
+	@keyframes transform-6 { from{transform:perspective(400px) rotateX(0deg); } to{transform:perspective(400px) rotateX(360deg); } }	
   </style>
   
 <script type='text/javascript' src='js/jq183.js'></script>
@@ -29,12 +46,13 @@
 =================
 
 <script>	
-	bc(data[0]);
+	//bc(data[0]);
 	var looptpl='';
 	if(data && data.length>0){
 		for(var i=0; i<data.length; i++){
 			looptpl+=data[i].unit+'\n';
 		}
+		//bc(data[0]);
 	}
 	$('.gzgz').html(looptpl);
 	bjs('idindex='+data.length);
