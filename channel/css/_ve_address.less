@@ -1,0 +1,115 @@
+/*表单*/
+fieldset {
+    color:#666;
+    margin:30px 20px;
+    legend {
+        
+        background-image:url(img/member/legend.gif);
+    }
+
+    input[type=text],input[type=password],select {
+        height:28px;
+        color:#2d2d2d;
+        padding:0 3px;
+        line-heigh:28px;
+        border:1px solid #ccc;
+        border-radius:2px;
+        width:180px;
+        &.small {width:120px;}
+        &.x-small {width:80px;}
+        &.xx-small {width:40px;}
+        &.long {width:250px;}
+        &.x-long {width:500px;}
+    }
+    input[type=text]:hover,input[type=password]:hover,select:hover {border-color:#8ec52b;}
+    select {
+        width:188px;
+        height:30px;
+    }
+    .err {
+        height:15px;
+        color:#f20;
+        clear:both;
+        padding:3px 0 3px 90px;
+    }
+
+
+    dl {
+        line-height:30px;
+        padding:2px 0;
+        dt{
+            float: left;
+            width:70px;
+            text-align:right;
+            padding-right:20px;
+            font {color:#f20;}
+        }
+        dd{}
+    }
+    &.user-address {
+        input[type=text] {
+            font-size:14px;font-weight:bold;
+        }
+    }
+    &.easy-buy {
+        width:620px;
+        padding-bottom:20px;
+        dl {
+            clear: both;
+            padding:5px 0;
+            dt {
+                width: 85px;
+            }
+            dd {
+                width: 500px;
+                float: left;
+            }
+        }
+        select {
+            margin:0 5px 5px 0;
+        }
+    }
+}
+
+
+//收货地址
+.address-list {
+    width:845px;
+    padding:24px 20px;
+    border-top:1px solid #dedede;
+    .address-title {
+        //.contentTitle();
+        background-image:url(img/member/address-title.gif);
+    }
+    .address-tip {
+        background-color:#feffe5;
+        border:1px solid #efe68b;
+        margin:10px 0;
+        padding:10px;
+        color:#666;
+        font {
+            color:#f20;
+        }
+    }
+}
+
+
+.address-table{
+    width:100%;
+    border-collapse: collapse;
+    border:1px solid #dbd6d0;
+    thead {}
+    td,th {
+        color:#666;
+        border:1px solid #dbd6d0;
+        text-align: center;
+    }
+    td {padding:10px 7px;}
+    th {
+        font-weight:bold;
+        height:40px;
+        line-height:40px;
+        background:url(img/member/address_table_th_bg.gif) repeat-x;
+    }
+    a {color:#ed145b}
+}

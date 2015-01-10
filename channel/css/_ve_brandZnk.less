@@ -1,0 +1,297 @@
+.wrapper {
+    background-color: #F8F8F8;
+    color: #666;
+}
+
+.ad {
+}
+.breadcrumb{
+    margin: 0 auto;
+    width: 1090px;
+    padding-left: 10px;
+    height:60px;
+    line-height:60px;
+    a{
+        font-weight: bold;
+        font-size: 16px;
+        color: #666;
+    }
+    i.icon{
+        font-style: normal;
+        font-family: SimSun,宋体, Arial;
+    }
+    span{
+        padding: 3px 15px;
+        border: 1px #e9e9e9 solid; 
+    }
+}
+// 筛选
+.screen{
+    position: relative;
+    .nav-category{
+        position: relative;
+        border-bottom:1px #ebebeb dashed;
+    }
+    label{
+        font-weight: bold;
+        font-size: 14px;
+        margin-top: 14px;
+    }
+    // 品牌筛选
+    .brand{
+        position: relative;
+        margin-left: 60px;
+        width: 940px;
+        // height: 56px;
+        overflow: hidden;
+        display: block;
+        li{
+            position: relative;
+            float: left;
+            margin-right: 20px;
+            margin-bottom: 12px;
+            img{
+                width: 84px;
+                height: 42px;
+            }
+            a{
+                display: block;
+                height: 42px;
+                width: 94px;
+                text-align: center;
+                overflow: hidden;
+                border: 1px #e9e9e9 solid;
+                .tit{
+                    display: none;
+                    }          
+                &:hover,&.on{
+                    border: 1px #ff51aa solid;
+                    img{
+                        display: none !important;
+                    }
+                    .tit{
+                        display: block;
+                        text-align: center;
+                        margin-top: 12px;
+                        color: #ff51aa;
+                    }
+                }
+                &.on{
+                    .close{
+                        display: inline-block;
+                        position: absolute;
+                        right: 5px;
+                        top:5px;
+                        overflow: hidden;
+                        .icon-ve_brandZnk-close;
+                    }
+               }
+            }
+        }
+    }
+    .ha{
+        height: auto;
+    }
+    .more,.retract{
+    position: absolute;
+    right: 2px;
+    top: 18px;
+    width: 40px;
+    height: 18px;
+    line-height: 18px;
+    cursor: pointer;
+    
+    }
+    // 类型筛选
+    .type{
+        margin-left: 50px;
+        height: 30px;
+        padding-top: 8px;
+        li{
+            position: relative;
+            float: left;
+            padding: 8px 0;
+            margin: 0 10px;
+            a{
+                display: inline-block;
+                padding-left: 12px;
+                padding-right: 20px;
+                height: 20px;
+                line-height: 20px;
+                color: #999;
+                &:hover,&.on{
+                    color: #ff51aa;
+                }
+                &.on{
+                    border: 1px #ff51aa solid;
+                    padding-right: 19px;
+                    padding-left: 11px;
+                    height: 18px;
+                    line-height: 18px;
+                    .close{
+                        display: inline-block;
+                        position: absolute;
+                        right: 8px;
+                        top:14px;
+                        overflow: hidden;
+                        .icon-ve_brandZnk-close;
+                    }   
+                }
+            }
+        }     
+    }
+    .brand-font{
+        a{
+            width: 60px;
+            overflow: hidden;
+            
+        }
+    }
+}
+// 更多筛选条件
+.more-screen{
+    position: relative;
+        .more-screenbtn,.retract-screenbtn{
+        position: absolute;
+        right: 0;
+        bottom:-29px;
+        _bottom:-32px;
+        height: 16px;
+        line-height: 16px;
+        text-align: center;
+        padding: 6px 12px;
+        border: 1px solid #efefef;
+        background: #f7f7f9;
+        cursor: pointer;
+        
+    }
+}
+
+// 公共箭头图标 
+.icon-more,.icon-retract{
+    display: inline-block;
+    margin-left: 3px;
+    _margin-top: -10px;
+    overflow: hidden;
+}
+.icon-more{
+    .icon-ve_brandZnk-more;
+}
+.icon-retract{
+    .icon-ve_brandZnk-retract;
+}
+
+// items
+.relate-brands {
+    width: 1070px;
+    padding: 0 15px;
+    background-color: #fff;
+    overflow: hidden;
+    // margin: -207px auto 0 auto;
+    margin: 0px auto;
+    .tempWrap {
+        margin-bottom: 40px;
+    }
+    .bd {
+        ul {
+            margin-left: -11px;
+            li{
+                float: left;
+                position: relative;
+            }
+            a.item{
+                display: inline-block;
+                padding: 1px;
+                margin-left: 11px;
+                _margin-left: 8px;
+                margin-bottom: 10px;
+                border: 1px #f3efeb solid;
+                height: 350px;
+                .item-img img {
+                    display: block;
+                    width: 255px;
+                    height: 255px;
+                }
+                .item-info {
+                    padding: 10px 0px;
+                    position: relative;
+                    cursor: pointer;
+                    color: #666;
+                    .title, .price {
+                        display: block;
+                    }
+                    em.title{
+                        padding: 0 10px;
+                        height: 40px;
+                        width: 235px;
+                        font-size: 13px;
+                        // font-weight: bold;
+                        overflow: hidden;
+                        // span.discount{
+                        //     color: #f72862;
+                        // }
+                    }
+                    .price {
+                        padding: 0 10px;
+                        // font-family: Arial, Helvetica, sans-serif;
+                        color: #ff51aa;
+                        height: 35px;
+                        width: 235px;
+                        overflow: hidden;
+                        i.rmb {
+                            font-size: 28px;
+                            font-style: normal;
+                        }
+                        del,span.discount {
+                            font-size: 13px;
+                            color: #666;
+                        }
+                    }
+                    i.icon-buy {
+                        display: none;
+                        position: absolute;
+                        right: 8px;
+                        top: 52px;
+                        .icon-ve_brandZnk-buy;
+                    }
+                }
+                .time{
+                    position: absolute;
+                    display: none;
+                    right: 10px;
+                    top: 10px;
+                    color: #ff51aa;
+                    i.icon-time{
+                        display: inline-block;
+                        margin-right: 5px;
+                        margin-top:2px;
+                        overflow: hidden;
+                        vertical-align: top;
+                        .icon-ve_brandZnk-time;
+                    }
+                }
+                &:hover {
+                    padding: 0;
+                    border: 2px #ff51aa solid;
+                    background: #ff51aa;
+                    .title,.price {
+                        color: #fff;
+                    }
+                    .time{
+                        display: block;
+                    }
+                    i.icon-buy,del{
+                        display: block;
+                    }
+                    span.discount{
+                        color: #fff !important;
+                    }
+                }
+                // 抢光了 位置调整
+                .item-soldout{
+                    top:40%;
+                }
+            }
+        }
+   }
+}
