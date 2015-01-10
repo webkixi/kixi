@@ -102,12 +102,39 @@ define('global/g', ['common/veget'], function(vg) {
         });
     }    
 
-    var __getClass = function(object){
+    function __getClass(object){
         return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1];
     };
 
+    function __measureDoc(){      
+        var doch = document.documentElement.clientHeight, docw = document.documentElement.clientWidth,
+        docST = document.documentElement.scrollTop||document.body.scrollTop,
+        docSL = document.documentElement.scrollLeft||document.body.scrollLeft;
+        return {dw:docw,dh:doch,st:docST,sl:docSL};
+    };
+
+    function __getRect(element) {
+      var offset = $(element).offset();
+      offset.bottom = offset.top+$(element).height();
+      offset.right = offset.left+$(element).width();
+      offset.width = $(element).width();
+      offset.height= $(element).height();
+      return offset;
+    };
+
     //模板替换方法
-    var tpl = function(tpl,jsondata){    
+    var tpl = function(tpl,jsondata){
+        if(__getClass(tpl)=='String'){
+
+        }
+        
+        if(__getClass(tpl)=='Object'){
+
+        }
+
+        if(__getClass(tpl)=='Array'){
+
+        }
         return vg.rpl(tpl,jsondata).gettmp();
     }
     
@@ -119,9 +146,9 @@ define('global/g', ['common/veget'], function(vg) {
     };
 
     var HashMap = function() {
-        var size = 0;  
-        var entry = new Object();            
-        this.put = function (key, value) {  
+        var size = 0;
+        var entry = new Object();
+        this.put = function (key, value) {
             var nkey = md5(key);
             entry[nkey] = value;  
             size++;  
@@ -132,7 +159,7 @@ define('global/g', ['common/veget'], function(vg) {
                     this.put(key, map[key]);  
                 }  
             } else {  
-                throw "输入类型不正确，必须是HashMap类型！";  
+                throw "输入类型不正确，必须是HashMap类型！";
             }  
         };           
         this.get = function (key) {  
@@ -204,30 +231,34 @@ define('global/g', ['common/veget'], function(vg) {
         };            
         this.toString = function () {  
             return __obj2str(entry);  
-        };    
-        __obj2str = function (o) {  
-            var r = [];  
-            if (typeof o == "string")  
-                return "\"" + o.replace(/([\'\"\\])/g, "\\$1").replace(/(\n)/g, "\\n").replace(/(\r)/g, "\\r").replace(/(\t)/g, "\\t") + "\"";  
-            if (typeof o == "object") {  
-                for (var i in o)  
-                    r.push("\"" + i + "\":" + __obj2str(o[i]));  
-                if (!!document.all && !/^\n?function\s*toString\(\)\s*\{\n?\s*\[native code\]\n?\s*\}\n?\s*$/.test(o.toString)) {  
-                    r.push("toString:" + o.toString.toString());  
-                }  
-                r = "{" + r.join() + "}";  
-                return r;  
-            }  
-            return o.toString();  
-        }        
-        
+        };
     }
 
-    function arg2arr(args){ return Array.prototype.slice.call(args); }
+    /*
+    *@ 对象转换成字符串
+    *  o - json obj
+    */
+    __obj2str = function (o) {  
+        var r = [];  
+        if (typeof o == "string")  
+            return "\"" + o.replace(/([\'\"\\])/g, "\\$1").replace(/(\n)/g, "\\n").replace(/(\r)/g, "\\r").replace(/(\t)/g, "\\t") + "\"";  
+        if (typeof o == "object") {  
+            for (var i in o)  
+                r.push("\"" + i + "\":" + __obj2str(o[i]));  
+            if (!!document.all && !/^\n?function\s*toString\(\)\s*\{\n?\s*\[native code\]\n?\s*\}\n?\s*$/.test(o.toString)) {  
+                r.push("toString:" + o.toString.toString());  
+            }  
+            r = "{" + r.join() + "}";  
+            return r;  
+        }  
+        return o.toString();  
+    }
+
+    function __arg2arr(args){ return Array.prototype.slice.call(args); }
 
     var _ctx;
     function init(context,opts,callback){
-        var ctx = context;
+        var ctx = context==window ? context : (function(){ window.context = context; return window.context;})();
         var cbk = callback;
         var req;
         var ajaxitem;
@@ -236,26 +267,43 @@ define('global/g', ['common/veget'], function(vg) {
             method:'post',
             data:'',
             type:'json'
-        }        
+        }    
+
+        //ajax stack priority high
         var ajaxStack=[];
         var ajaxVarStack=[];
         var ajaxResultStack=[];
+
+        //normal stack  priority low
+        var funStack = [];
+        var funVerStack = [];
+        var funResultStack = [];
+
         var resault={};
-        for(var iii in opts){
+        for(var iii in opts){            
             if(__getClass(opts[iii])=='Object'){
-                req = opts[iii];
-                if(!req.url||req.url=='') return;
-                ajaxitem = $.extend({},defaults,req);
-                ajaxitem.vari = iii;
-                ajaxStack.push(ajaxitem);
-                ajaxVarStack.push(iii);                
-            }else{
-                // ajaxVarStack.push(iii);
+                if(opts[iii].jquery){
+                    var ele = opts[iii][0];
+                    console.log(ele);
+                }else{
+                    req = opts[iii];
+                    if(!req.url||req.url=='') return;
+                    ajaxitem = $.extend({},defaults,req);
+                    ajaxitem.vari = iii;
+                    ajaxStack.push(ajaxitem);
+                    ajaxVarStack.push(iii);
+                }
+            }else if(__getClass(opts[iii])=='Function'){
+                var fun = opts[iii];
+                funStack.push(fun);
+                funVerStack.push(iii);
+                add_action(iii,fun,fun.length);
             }
         }
 
         var tmp;
-        function cb(err,data){            
+        function cb(err,data){
+            var ttt;        
             if(data) {    
                 var vtmp = ajaxVarStack.shift();
                 resault[vtmp] = data;
@@ -273,9 +321,20 @@ define('global/g', ['common/veget'], function(vg) {
                 ajaxResultStack=[];
                 // resault={};
 
-                callback(ctx);
+                if(funVerStack.length>0){                    
+                    clearTimeout(ttt);
+                    for(var i=0; i<funVerStack.length; i++){
+                        (function(j){
+                            var doact = funVerStack[j];
+                            ctx[doact] = funStack[j];
+                            setTimeout(function(){ do_action(doact) }, 17);    
+                        })(i)
+                    }
+                }
+                if(callback) callback(ctx);
             }
-        }        
+        }
+
         function runajax(ttt){            
             $.ajax({
                 url: ttt.url,
@@ -294,16 +353,16 @@ define('global/g', ['common/veget'], function(vg) {
                 }
             });
         }
-        if(ajaxStack.length>0){
-            cb();
-        }
+        // if(ajaxStack.length>0){cb(); } 
+        cb();
     }
 
-    var actmap = new HashMap();        
-    var do_action = function(name){        
+    //hooks
+    var actmap = new HashMap();
+    var do_action = function(name){
         var funs=[]; 
         var tmp;
-        var argmts = arg2arr(arguments);        
+        var argmts = __arg2arr(arguments);        
         if(actmap.containsKey(name)){                
             funs = actmap.get(name);
             if(funs.length>0){                
@@ -331,7 +390,7 @@ define('global/g', ['common/veget'], function(vg) {
         var hasdefine=false;
         propnum = propnum ? propnum : 1;
         if(actmap.containsKey(name)){
-            funs = actmap.get(name);            
+            funs = actmap.get(name);
             for(var j=0; j<funs.length; j++){
                 if(funs[j].toString()==fun.toString()){
                     hasdefine=true;
@@ -349,18 +408,79 @@ define('global/g', ['common/veget'], function(vg) {
             funs.push(tmp);
             actmap.put(name,funs);
         }
-    }    
-    
-    exports.do_action = do_action;
-    exports.add_action = add_action;
+    }
 
-    exports.veget = vg;
+    
+    tips = function(show,msg,timeout){        
+        var msg_left, msg_top;
+        var docRect = __measureDoc();
+        var sl = docRect.sl;
+        var st = docRect.st;
+        var cw = docRect.dw;
+        var ch = docRect.dh;
+        var flymsg;
+
+        timeout = timeout ? timeout : 17;
+
+        // !$('.showmsg').length ? $("body").append("<div class='showmsg yuanjiao2 yinying2' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>") : '';
+        $("body").append("<div class='showmsg ' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>");
+        flymsg = $('.showmsg');
+
+        // var msgitem = $("<div class='showmsg yuanjiao2 yinying2'>请稍候。。。</div>");
+        // flymsg = msgitem;   
+
+        if(typeof(msg)=='undefined') msg = "请稍候。。。";
+        // flymsg[0].style.opacity = 1;
+        flymsg.html(msg);
+        flymsg[0].style.cssText = 'z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;';
+        
+        //position:absolute
+        // msg_left = sl + Math.round((parseInt(cw)-$("#showmsg").width())/2);          
+        // msg_top = st+Math.round((parseInt(ch)-50)/2);    
+        //position:fixed            
+        var msgct = __getRect(flymsg[0]);
+        msg_left = Math.round((parseInt(cw)-msgct.width)/2);
+        msg_top  = Math.round((parseInt(ch)-msgct.height)/2);
+        flymsg.css({"left":msg_left,"top":-msg_top,"opacity":1});
+        // flymsg.css({"left":msg_left,"top":msg_top,"opacity":1});
+        // flymsg[0].style.left = msg_left+'px';
+        // flymsg[0].style.top = msg_top+'px';
+        flymsg.show().animate({top:10},600).delay(1000).fadeOut('slow');
+        // flymsg.css({'transform' : 'rotateX(0deg) translateZ(45px) scale(1)'});
+
+        // if(show == "show"){          
+        //  setTimeout(function(){$('#showmsg').show().animate({top:0},400).delay(1000).fadeOut('slow')},timeout);
+        // }
+        // else if(show == "hide"){
+        //  if(typeof(msg)=='undefined') msg = "拖放完成";
+        //  $("#showmsg")[0].innerHTML = msg;
+        //  setTimeout(function(){$('#showmsg').animate({top:0,opacity:'0'},200)},1000);
+        // }else{           
+        //  $("#showmsg")[0].style.opacity = 1;
+        //  $("#showmsg")[0].innerHTML = show;
+        //  setTimeout(function(){$('#showmsg').animate({top:0,opacity:'0'},200)},1500);
+        // }
+
+        
+    }   
+
+    window.tips = tips;
+    
+    //not recommended
     exports.regi = regi;
     exports.use = use;
-    exports.init = init;
-    exports.tpl = tpl;   
     exports.regiOne = regiOne;
     exports.useOne = useOne;
+
+    //hooks
+    exports.do_action = do_action;
+    exports.add_action = add_action;    
+    
+    //pull remote data
+    exports.init = init;
+    exports.tpl = tpl;
+
+    exports.veget = vg;
 
     return exports;
 })
