@@ -449,10 +449,13 @@ define('global/g', ['common/veget'], function(vg) {
 
         function newmsg(mm){
             var tip = document.createElement('div');
+            var subtip = document.createElement('div');
             tip.className = 'showmsg';
-            tip.style.cssText = 'display:none;margin-top:10px;z-index:10030;color:#fff;background-color:#4ba2f9;width:100%;padding:10px;text-align:center;font-size:16px;line-height:220%;';
+            tip.style.cssText = 'display:none;z-index:10030;width:100%;text-align:center; margin-top:10px;';
+            subtip.style.cssText = 'width:100%;height:100%;color:#fff;background-color:#4ba2f9;line-height:40px;font-size:16px;';
             if(typeof(mm)=='undefined') mm = "请稍候。。。";
-            tip.innerHTML = mm;
+            subtip.innerHTML = mm;
+            tip.appendChild(subtip);
             return tip;
         }
 
@@ -462,10 +465,10 @@ define('global/g', ['common/veget'], function(vg) {
 
             var msgitem = new newmsg(mm);
             $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
-            $('#msgcontainer').prepend(msgitem);
+            $('#msgcontainer').append(msgitem);
 
             msgitem.style.left = msg_left+'px';
-            $(msgitem).fadeIn('slow').delay(1500).fadeOut('slow');
+            $(msgitem).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
             var ggg = setTimeout(function(){
                 $(msgitem).remove();
                 if($('.showmsg').length==0) $('#msgcontainer').remove();
@@ -477,7 +480,7 @@ define('global/g', ['common/veget'], function(vg) {
         });        
     }   
 
-    window.tips = tips;
+    // window.tips = tips;
     
     //not recommended
     exports.regi = regi;
@@ -487,11 +490,13 @@ define('global/g', ['common/veget'], function(vg) {
 
     //hooks
     exports.do_action = do_action;
-    exports.add_action = add_action;    
+    exports.add_action = add_action;
     
     //pull remote data
     exports.init = init;
     exports.tpl = tpl;
+
+    exports.tips = tips;
 
     exports.veget = vg;
 
