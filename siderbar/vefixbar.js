@@ -2,9 +2,10 @@
     if (typeof define === 'function' && define.amd) {
         define('sidebar/vefixbar',[], vefixbar);
     } else {
-        vefixbar($);
+        vefixbar();
     }
-})(function(){ 
+})(function(){
+// define('sidebar/vefixbar', [], function(){
     var Class = {create: function() {  return function() {this.initialize.apply(this, arguments);} } }
     var vfixbar = Class.create(); 
     vfixbar.prototype = {
@@ -185,10 +186,10 @@
             });
             //执行回调 
             callback.call(btn,thefixpop,fix);
-            $(btn).on('mouseenter',function(e){
+            $(btn).mouseenter(function(e){
                 var doc   = _measurePopPos(),
                 cur_btn   = this, 
-                p         = $(this).offset(),    
+                ppp         = $(this).offset(),    
                 btnindx   = this.getAttribute('idindex') ;
 
                 //绑定方法//必须回调之前
@@ -197,10 +198,10 @@
                              
                 //计算位置
                 var fixpoprect = __getRect(thefixpop[0]);
-                var diftop = (function(){  return (p.top+200>doc.dh+doc.st) ? fixpoprect.top+(p.top+cur_btn.offsetHeight-fixpoprect.bottom-doc.st) : p.top-doc.st; })();
-                var difleft = (function(){ return (position=='right'||p.left+160>doc.dw) ?cur_btn.offsetWidth : p.left+cur_btn.offsetWidth; })();              
+                var diftop = (function(){  return (ppp.top+200>doc.dh+doc.st) ? fixpoprect.top+(ppp.top+cur_btn.offsetHeight-fixpoprect.bottom-doc.st) : ppp.top-doc.st; })();
+                var difleft = (function(){ return (position=='right'||ppp.left+160>doc.dw) ?cur_btn.offsetWidth : ppp.left+cur_btn.offsetWidth; })();              
                 var inifixpop=function(){
-                    (position=='right'||p.left+160>doc.dw) ? thefixpop.hide().css({'right': -(200+fixpoprect.width)+'px','opacity':0})
+                    (position=='right'||ppp.left+160>doc.dw) ? thefixpop.hide().css({'right': -(200+fixpoprect.width)+'px','opacity':0})
                     : thefixpop.hide().css({'left': -(200+fixpoprect.width)+'px','opacity':0}); // thefixpop.hide();
                 }
 
@@ -210,7 +211,7 @@
                 !thebar.btnindex?inifixpop():'';
                 thefixpop.stop();
                 thefixpop.show(100).animate({'top':diftop+'px','opacity':1},80);
-                (p.left+160>doc.dw) ? thefixpop.show(100).animate({right:difleft+"px",'opacity':1},160) : thefixpop.show(100).animate({left:difleft+"px",'opacity':1},160);
+                (ppp.left+160>doc.dw) ? thefixpop.show(100).animate({right:difleft+"px",'opacity':1},160) : thefixpop.show(100).animate({left:difleft+"px",'opacity':1},160);
           
                 thebar.btnindex = btnindx;
                 thebar.btnmethod = method;
@@ -475,5 +476,6 @@
         return new vfixbar(this,position);
     };
 
-    return $.fn.vefixbar;
+    $.vefixbar = vfixbar;
+    // return $.vefixbar;
 });

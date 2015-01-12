@@ -106,7 +106,7 @@ define('global/g', ['common/veget'], function(vg) {
         return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1];
     };
 
-    function __measureDoc(){      
+    function __measureDoc(){
         var doch = document.documentElement.clientHeight, docw = document.documentElement.clientWidth,
         docST = document.documentElement.scrollTop||document.body.scrollTop,
         docSL = document.documentElement.scrollLeft||document.body.scrollLeft;
@@ -267,7 +267,7 @@ define('global/g', ['common/veget'], function(vg) {
             method:'post',
             data:'',
             type:'json'
-        }    
+        }
 
         //ajax stack priority high
         var ajaxStack=[];
@@ -284,7 +284,7 @@ define('global/g', ['common/veget'], function(vg) {
             if(__getClass(opts[iii])=='Object'){
                 if(opts[iii].jquery){
                     var ele = opts[iii][0];
-                    console.log(ele);
+                    // console.log(ele);
                 }else{
                     req = opts[iii];
                     if(!req.url||req.url=='') return;
@@ -298,6 +298,12 @@ define('global/g', ['common/veget'], function(vg) {
                 funStack.push(fun);
                 funVerStack.push(iii);
                 add_action(iii,fun,fun.length);
+            }else if(__getClass(opts[iii])=='Array'){                
+                var ary = opts[iii];                
+                if(__getClass(ary[0])!=='Function') return;                
+                funStack.push(ary);
+                funVerStack.push(iii);
+                add_action(iii,ary,ary[0].length);
             }
         }
 
@@ -314,20 +320,35 @@ define('global/g', ['common/veget'], function(vg) {
                 runajax(tmp);
             }else{
                 for(var v in resault){
-                    ctx[v] = resault[v];
+                    ctx[v] = resault[v];                
                 }
                 ajaxStack=[];
                 ajaxVarStack=[];
                 ajaxResultStack=[];
                 // resault={};
 
-                if(funVerStack.length>0){                    
+                if(funVerStack.length>0){                                  
+                    var tfun;
+                    var tprompt;
+                    var doact;
                     clearTimeout(ttt);
                     for(var i=0; i<funVerStack.length; i++){
                         (function(j){
-                            var doact = funVerStack[j];
-                            ctx[doact] = funStack[j];
-                            setTimeout(function(){ do_action(doact) }, 17);    
+                            doact = funVerStack[j];
+                            if(__getClass(funStack[j])=='Function'){
+                                ctx[doact] = funStack[j];
+                            }
+                            else if(__getClass(funStack[j])=='Array'){                                
+                                doact = funVerStack[j];
+                                tfun = funStack[j][0];
+                                tprompt = funStack[j].slice(1);
+                                ctx[doact] = tfun;                                
+                            }
+                            if(tprompt&&tprompt.length>0){                         
+                                setTimeout(function(){ do_action(doact,tprompt) }, 17);
+                            }else{                                
+                                setTimeout(function(){ do_action(doact) }, 17);
+                            }
                         })(i)
                     }
                 }
@@ -359,22 +380,25 @@ define('global/g', ['common/veget'], function(vg) {
 
     //hooks
     var actmap = new HashMap();
-    var do_action = function(name){
+    function do_action(name){
         var funs=[]; 
-        var tmp;
-        var argmts = __arg2arr(arguments);        
-        if(actmap.containsKey(name)){                
-            funs = actmap.get(name);
-            if(funs.length>0){                
+        var tmp;        
+        var argmts = __arg2arr(arguments);               
+        if(actmap.containsKey(name)){
+            funs = actmap.get(name);            
+            if(funs.length>0){                                
                 for(var i=0; i<funs.length; i++){
-                    tmp = funs[i];    
-                    if(__getClass(tmp.fun)!=='Function') return;
-                    if(tmp.propnum&&tmp.propnum>0){
+                    tmp = funs[i];                     
+                    if(__getClass(tmp.fun)!=='Function') {
+                        if(__getClass(tmp.fun[0])!=='Function') return;
+                        tmp.fun = tmp.fun[0];
+                    }                    
+                    if(tmp.propnum&&tmp.propnum>0){                        
                         if(argmts.length>2&&argmts.length>tmp.propnum){
                             argmts = argmts.splice(1,(1+tmp.propnum));
                         }else{
                             argmts = argmts.slice(1);
-                        }                  
+                        }
                         tmp.fun.apply(this,argmts);
                     }else
                         tmp.fun();
@@ -383,85 +407,74 @@ define('global/g', ['common/veget'], function(vg) {
         }
     }
 
-    var add_action = function(name,fun,propnum){
-        if(__getClass(fun)!=='Function') return;        
-        var funs=[];
-        var tmp = {};
-        var hasdefine=false;
-        propnum = propnum ? propnum : 1;
-        if(actmap.containsKey(name)){
-            funs = actmap.get(name);
-            for(var j=0; j<funs.length; j++){
-                if(funs[j].toString()==fun.toString()){
-                    hasdefine=true;
+    function add_action(name,fun,propnum){       
+        if(__getClass(fun)=='Function'||__getClass(fun)=='Array'){        
+            var funs=[];
+            var tmp = {};
+            var hasdefine=false;        
+            propnum = propnum ? propnum : 1;
+            if(actmap.containsKey(name)){
+                funs = actmap.get(name);                
+                for(var j=0; j<funs.length; j++){                    
+                    if(__getClass(fun)=='Array'){                        
+                        if(__obj2str(funs[j].fun)==__obj2str(fun[0])){                                                        
+                            hasdefine=true;
+                        }
+                    }else if(__obj2str(funs[j])==__obj2str(fun)){
+                        hasdefine=true;
+                    }
+                }                
+                if(hasdefine==false){
+                    tmp.fun = fun;
+                    tmp.propnum = propnum;
+                    funs.push(tmp);
+                    actmap.put(name,funs);
                 }
-            }
-            if(hasdefine==false){                
-                tmp.fun = fun;
+            }else{                
+                tmp.fun = fun;                
                 tmp.propnum = propnum;
                 funs.push(tmp);
                 actmap.put(name,funs);
             }
-        }else{
-            tmp.fun = fun;
-            tmp.propnum = propnum;
-            funs.push(tmp);
-            actmap.put(name,funs);
         }
-    }
-
+    }    
     
-    tips = function(show,msg,timeout){        
+    var tips = function(show,msg,timeout){
         var msg_left, msg_top;
         var docRect = __measureDoc();
         var sl = docRect.sl;
         var st = docRect.st;
         var cw = docRect.dw;
         var ch = docRect.dh;
-        var flymsg;
 
-        timeout = timeout ? timeout : 17;
+        function newmsg(mm){
+            var tip = document.createElement('div');
+            tip.className = 'showmsg';
+            tip.style.cssText = 'display:none;margin-top:10px;z-index:10030;color:#fff;background-color:#4ba2f9;width:100%;padding:10px;text-align:center;font-size:16px;line-height:220%;';
+            if(typeof(mm)=='undefined') mm = "请稍候。。。";
+            tip.innerHTML = mm;
+            return tip;
+        }
 
-        // !$('.showmsg').length ? $("body").append("<div class='showmsg yuanjiao2 yinying2' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>") : '';
-        $("body").append("<div class='showmsg ' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>");
-        flymsg = $('.showmsg');
+        function pushmsg(mm){
+            clearTimeout(ggg);
+            msg_left = Math.round((parseInt(cw)-300)/2);
 
-        // var msgitem = $("<div class='showmsg yuanjiao2 yinying2'>请稍候。。。</div>");
-        // flymsg = msgitem;   
+            var msgitem = new newmsg(mm);
+            $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
+            $('#msgcontainer').prepend(msgitem);
 
-        if(typeof(msg)=='undefined') msg = "请稍候。。。";
-        // flymsg[0].style.opacity = 1;
-        flymsg.html(msg);
-        flymsg[0].style.cssText = 'z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;';
-        
-        //position:absolute
-        // msg_left = sl + Math.round((parseInt(cw)-$("#showmsg").width())/2);          
-        // msg_top = st+Math.round((parseInt(ch)-50)/2);    
-        //position:fixed            
-        var msgct = __getRect(flymsg[0]);
-        msg_left = Math.round((parseInt(cw)-msgct.width)/2);
-        msg_top  = Math.round((parseInt(ch)-msgct.height)/2);
-        flymsg.css({"left":msg_left,"top":-msg_top,"opacity":1});
-        // flymsg.css({"left":msg_left,"top":msg_top,"opacity":1});
-        // flymsg[0].style.left = msg_left+'px';
-        // flymsg[0].style.top = msg_top+'px';
-        flymsg.show().animate({top:10},600).delay(1000).fadeOut('slow');
-        // flymsg.css({'transform' : 'rotateX(0deg) translateZ(45px) scale(1)'});
+            msgitem.style.left = msg_left+'px';
+            $(msgitem).fadeIn('slow').delay(1500).fadeOut('slow');
+            var ggg = setTimeout(function(){
+                $(msgitem).remove();
+                if($('.showmsg').length==0) $('#msgcontainer').remove();
+            }, 3000);
+        }
 
-        // if(show == "show"){          
-        //  setTimeout(function(){$('#showmsg').show().animate({top:0},400).delay(1000).fadeOut('slow')},timeout);
-        // }
-        // else if(show == "hide"){
-        //  if(typeof(msg)=='undefined') msg = "拖放完成";
-        //  $("#showmsg")[0].innerHTML = msg;
-        //  setTimeout(function(){$('#showmsg').animate({top:0,opacity:'0'},200)},1000);
-        // }else{           
-        //  $("#showmsg")[0].style.opacity = 1;
-        //  $("#showmsg")[0].innerHTML = show;
-        //  setTimeout(function(){$('#showmsg').animate({top:0,opacity:'0'},200)},1500);
-        // }
-
-        
+        init(this,{
+            ttips: [pushmsg,msg]
+        });        
     }   
 
     window.tips = tips;
