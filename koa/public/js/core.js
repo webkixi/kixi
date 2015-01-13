@@ -35,158 +35,228 @@ function tpl(tpl,jsondata){
 }
 
 var _ctx;
-function init(context,opts,callback){
-    var ctx = context==window ? context : (function(){ window.context = context; return window.context;})();
-    var cbk = callback;
-    var req;
-    var ajaxitem;
-    var defaults = {
-        url:'',
-        method:'post',
-        data:'',
-        type:'json'
-    }    
-
-    //ajax stack priority high
-    var ajaxStack=[];
-    var ajaxVarStack=[];
-    var ajaxResultStack=[];
-
-    //normal stack  priority low
-    var funStack = [];
-    var funVerStack = [];
-    var funResultStack = [];
-
-    var resault={};
-    for(var iii in opts){            
-        if(__getClass(opts[iii])=='Object'){
-            if(opts[iii].jquery){
-                var ele = opts[iii][0];
-                console.log(ele);
-            }else{
-                req = opts[iii];
-                if(!req.url||req.url=='') return;
-                ajaxitem = $.extend({},defaults,req);
-                ajaxitem.vari = iii;
-                ajaxStack.push(ajaxitem);
-                ajaxVarStack.push(iii);
-            }
-        }else if(__getClass(opts[iii])=='Function'){
-            var fun = opts[iii];
-            funStack.push(fun);
-            funVerStack.push(iii);
-            add_action(iii,fun,fun.length);
+    function init(context,opts,callback){
+        var ctx = context==window ? context : (function(){ window.context = context; return window.context;})();
+        var cbk = callback;
+        var req;
+        var ajaxitem;
+        var defaults = {
+            url:'',
+            method:'post',
+            data:'',
+            type:'json'
         }
+
+        //ajax stack priority high
+        var ajaxStack=[];
+        var ajaxVarStack=[];
+        var ajaxResultStack=[];
+
+        //normal stack  priority low
+        var funStack = [];
+        var funVerStack = [];
+        var funResultStack = [];
+
+        var resault={};
+        for(var iii in opts){            
+            if(__getClass(opts[iii])=='Object'){
+                if(opts[iii].jquery){
+                    var ele = opts[iii][0];
+                    // console.log(ele);
+                }else{
+                    req = opts[iii];
+                    if(!req.url||req.url=='') return;
+                    ajaxitem = $.extend({},defaults,req);
+                    ajaxitem.vari = iii;
+                    ajaxStack.push(ajaxitem);
+                    ajaxVarStack.push(iii);
+                }
+            }else if(__getClass(opts[iii])=='Function'){
+                var fun = opts[iii];
+                funStack.push(fun);
+                funVerStack.push(iii);
+                add_action(iii,fun,fun.length);
+            }else if(__getClass(opts[iii])=='Array'){                
+                var ary = opts[iii];                
+                if(__getClass(ary[0])!=='Function') return;                
+                funStack.push(ary);
+                funVerStack.push(iii);
+                add_action(iii,ary,ary[0].length);
+            }
+        }
+
+        var tmp;
+        function cb(err,data){
+            var ttt;        
+            if(data) {    
+                var vtmp = ajaxVarStack.shift();
+                resault[vtmp] = data;
+                ajaxResultStack.push(data);
+            }
+            if(ajaxStack.length>0){
+                tmp = ajaxStack.shift();
+                runajax(tmp);
+            }else{
+                for(var v in resault){
+                    ctx[v] = resault[v];                
+                }
+                ajaxStack=[];
+                ajaxVarStack=[];
+                ajaxResultStack=[];
+                // resault={};
+
+                if(funVerStack.length>0){                                  
+                    var tfun;
+                    var tprompt;
+                    var doact;
+                    clearTimeout(ttt);
+                    for(var i=0; i<funVerStack.length; i++){
+                        (function(j){
+                            doact = funVerStack[j];
+                            if(__getClass(funStack[j])=='Function'){
+                                ctx[doact] = funStack[j];
+                            }
+                            else if(__getClass(funStack[j])=='Array'){                                
+                                doact = funVerStack[j];
+                                tfun = funStack[j][0];
+                                tprompt = funStack[j].slice(1);
+                                ctx[doact] = tfun;                                
+                            }
+                            if(tprompt&&tprompt.length>0){                         
+                                setTimeout(function(){ do_action(doact,tprompt) }, 17);
+                            }else{                                
+                                setTimeout(function(){ do_action(doact) }, 17);
+                            }
+                        })(i)
+                    }
+                }
+                if(callback) callback(ctx);
+            }
+        }
+
+        function runajax(ttt){            
+            $.ajax({
+                url: ttt.url,
+                dataType: ttt.type,
+                data: ttt.data,
+                type: ttt.method,
+                success: function(data){
+                    if(!data||data=='')
+                        data={};
+                    cb(null,data);
+                },
+                error: function(data){
+                    if(!data||data=='')
+                        data={};
+                    cb(null,data);
+                }
+            });
+        }
+        // if(ajaxStack.length>0){cb(); } 
+        cb();
     }
 
-    var tmp;
-    function cb(err,data){
-        var ttt;        
-        if(data) {    
-            var vtmp = ajaxVarStack.shift();
-            resault[vtmp] = data;
-            ajaxResultStack.push(data);
-        }
-        if(ajaxStack.length>0){
-            tmp = ajaxStack.shift();
-            runajax(tmp);
-        }else{
-            for(var v in resault){
-                ctx[v] = resault[v];                
-            }
-            ajaxStack=[];
-            ajaxVarStack=[];
-            ajaxResultStack=[];
-            // resault={};
-
-            if(funVerStack.length>0){
-                clearTimeout(ttt);
-                for(var i=0; i<funVerStack.length; i++){
-                    (function(j){
-                        var doact = funVerStack[j];
-                        ctx[doact] = funStack[j];
-                        setTimeout(function(){ do_action(doact) }, 17);    
-                    })(i)
+    //hooks
+    var actmap = new HashMap();
+    function do_action(name){
+        var funs=[]; 
+        var tmp;        
+        var argmts = __arg2arr(arguments);               
+        if(actmap.containsKey(name)){
+            funs = actmap.get(name);            
+            if(funs.length>0){                                
+                for(var i=0; i<funs.length; i++){
+                    tmp = funs[i];                     
+                    if(__getClass(tmp.fun)!=='Function') {
+                        if(__getClass(tmp.fun[0])!=='Function') return;
+                        tmp.fun = tmp.fun[0];
+                    }                    
+                    if(tmp.propnum&&tmp.propnum>0){                        
+                        if(argmts.length>2&&argmts.length>tmp.propnum){
+                            argmts = argmts.splice(1,(1+tmp.propnum));
+                        }else{
+                            argmts = argmts.slice(1);
+                        }
+                        tmp.fun.apply(this,argmts);
+                    }else
+                        tmp.fun();
                 }
             }
-            if(callback) callback(ctx);
         }
     }
 
-    function runajax(ttt){            
-        $.ajax({
-            url: ttt.url,
-            dataType: ttt.type,
-            data: ttt.data,
-            type: ttt.method,
-            success: function(data){
-                if(!data||data=='')
-                    data={};
-                cb(null,data);
-            },
-            error: function(data){
-                if(!data||data=='')
-                    data={};
-                cb(null,data);
+    function add_action(name,fun,propnum){       
+        if(__getClass(fun)=='Function'||__getClass(fun)=='Array'){        
+            var funs=[];
+            var tmp = {};
+            var hasdefine=false;        
+            propnum = propnum ? propnum : 1;
+            if(actmap.containsKey(name)){
+                funs = actmap.get(name);                
+                for(var j=0; j<funs.length; j++){                    
+                    if(__getClass(fun)=='Array'){                        
+                        if(__obj2str(funs[j].fun)==__obj2str(fun[0])){                                                        
+                            hasdefine=true;
+                        }
+                    }else if(__obj2str(funs[j])==__obj2str(fun)){
+                        hasdefine=true;
+                    }
+                }                
+                if(hasdefine==false){
+                    tmp.fun = fun;
+                    tmp.propnum = propnum;
+                    funs.push(tmp);
+                    actmap.put(name,funs);
+                }
+            }else{                
+                tmp.fun = fun;                
+                tmp.propnum = propnum;
+                funs.push(tmp);
+                actmap.put(name,funs);
             }
-        });
-    }
-    // if(ajaxStack.length>0){cb(); } 
-    cb();
-}
+        }
+    }    
+    
+    var tips = function(show,msg,timeout){
+        var msg_left, msg_top;
+        var docRect = __measureDoc();
+        var sl = docRect.sl;
+        var st = docRect.st;
+        var cw = docRect.dw;
+        var ch = docRect.dh;
 
-//hooks
-var actmap = new HashMap();
-function do_action(name){
-    var funs=[]; 
-    var tmp;
-    var argmts = __arg2arr(arguments);        
-    if(actmap.containsKey(name)){                
-        funs = actmap.get(name);
-        if(funs.length>0){                
-            for(var i=0; i<funs.length; i++){
-                tmp = funs[i];    
-                if(__getClass(tmp.fun)!=='Function') return;
-                if(tmp.propnum&&tmp.propnum>0){
-                    if(argmts.length>2&&argmts.length>tmp.propnum){
-                        argmts = argmts.splice(1,(1+tmp.propnum));
-                    }else{
-                        argmts = argmts.slice(1);
-                    }                  
-                    tmp.fun.apply(this,argmts);
-                }else
-                    tmp.fun();
-            }
+        function newmsg(mm){
+            var tip = document.createElement('div');
+            var subtip = document.createElement('div');
+            tip.className = 'showmsg';
+            tip.style.cssText = 'display:none;z-index:10030;width:100%;text-align:center; margin-top:10px;';
+            subtip.style.cssText = 'width:100%;height:100%;color:#fff;background-color:#4ba2f9;line-height:40px;font-size:16px;';
+            if(typeof(mm)=='undefined') mm = "请稍候。。。";
+            subtip.innerHTML = mm;
+            tip.appendChild(subtip);
+            return tip;
         }
-    }
-}
 
-function add_action(name,fun,propnum){
-    if(__getClass(fun)!=='Function') return;        
-    var funs=[];
-    var tmp = {};
-    var hasdefine=false;
-    propnum = propnum ? propnum : 1;
-    if(actmap.containsKey(name)){
-        funs = actmap.get(name);
-        for(var j=0; j<funs.length; j++){
-            if(funs[j].toString()==fun.toString()){
-                hasdefine=true;
-            }
+        function pushmsg(mm){
+            clearTimeout(ggg);
+            msg_left = Math.round((parseInt(cw)-300)/2);
+
+            var msgitem = new newmsg(mm);
+            $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
+            $('#msgcontainer').append(msgitem);
+
+            msgitem.style.left = msg_left+'px';
+            $(msgitem).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
+            var ggg = setTimeout(function(){
+                $(msgitem).remove();
+                if($('.showmsg').length==0) $('#msgcontainer').remove();
+            }, 3000);
         }
-        if(hasdefine==false){                
-            tmp.fun = fun;
-            tmp.propnum = propnum;
-            funs.push(tmp);
-            actmap.put(name,funs);
-        }
-    }else{
-        tmp.fun = fun;
-        tmp.propnum = propnum;
-        funs.push(tmp);
-        actmap.put(name,funs);
-    }
-}
+
+        init(this,{
+            ttips: [pushmsg,msg]
+        });        
+    }   
 
 
 function HashMap() {  
