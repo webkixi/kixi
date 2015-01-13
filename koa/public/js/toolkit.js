@@ -45,59 +45,45 @@ function creatstyle(name,cb){
     cb && cb.call(this,nstyle);
 }
 
-function msg_box(show,msg,timeout){
-    console.log('aaaaaaaaaaa');
-    var msg_left, msg_top;
+function tanbox(msg,cb){
     var docRect = __measureDoc();
-    var sl = docRect.sl;
-    var st = docRect.st;
-    var cw = docRect.dw;
-    var ch = docRect.dh;
-    var flymsg;
+    var scrollleft = docRect.sl;
+    var scrolltop = docRect.st;
+    var clientwidth = docRect.dw;
+    var clientheight = docRect.dh;
 
-    timeout = timeout ? timeout : 17;
+    var tan = new tipsbox();
+    tan.tipsBox = function(){
+        // var tip = document.createElement('div');        
+        var msg_left = Math.round((parseInt(clientwidth)-500)/2);
+        var msg_top = Math.round((parseInt(clientheight)-500)/2);
+        var tanboxhtml = '<div id="msgtan" style="display:none;background-color:#fff;z-Index:10000;width:500px;height:500px;position:fixed;top:'+msg_top+'px;left:'+msg_left+'px;"></div>';
+        $('#msgtan').length ? 
+        (function(){
+            $('#msgtan').remove();
+            $('body').append(tanboxhtml);
+        })()
+        : $('body').append(tanboxhtml);
+        return $('#msgtan')[0];
+    };
+    tan.tipsItem = function(){
+        var subtip = document.createElement('div');
+        subtip.id = 'tancontent'
+        subtip.style.cssText = 'width:100%;height:100%;text-align:center;display:'        
+        return subtip;
+    };
+    tan.anim = function(item,container){
+        $(container).fadeIn(1000);
+    };
 
-    // !$('.showmsg').length ? $("body").append("<div class='showmsg yuanjiao2 yinying2' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>") : '';
-    // var msgitem = $("<div class='showmsg yuanjiao2 yinying2'>请稍候。。。</div>");
-    // flymsg = msgitem;    
-    $("body").append("<div class='showmsg' style='z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;'>请稍候。。。</div>");
-    flymsg = $('.showmsg');
-    if(typeof(msg)=='undefined') msg = "请稍候。。。";
-    // flymsg[0].style.opacity = 1;
-    flymsg.html(msg);
-    flymsg[0].style.cssText = 'z-index:10030;color:#fff;background-color:#4ba2f9;width:auto;padding:10px;text-align:center;position:fixed;font-size:16px;line-height:220%;';
-    
-    //position:absolute
-    // msg_left = sl + Math.round((parseInt(cw)-$("#showmsg").width())/2);          
-    // msg_top = st+Math.round((parseInt(ch)-50)/2);    
-    //position:fixed            
-    var msgct = __getRect(flymsg[0]);
-    console.log(msgct);
-    msg_left = Math.round((parseInt(cw)-msgct.width)/2);
-    msg_top  = Math.round((parseInt(ch)-msgct.height)/2);
-    flymsg.css({"left":msg_left,"top":msg_top,"opacity":1});
-    // flymsg[0].style.left = msg_left+'px';
-    // flymsg[0].style.top = msg_top+'px';
-    // flymsg.show().animate({top:0},600).delay(1000).fadeOut('slow');
-    flymsg.show().addClass('t6');
-
-    // if(show == "show"){          
-    //  setTimeout(function(){$('#showmsg').show().animate({top:0},400).delay(1000).fadeOut('slow')},timeout);
-    // }
-    // else if(show == "hide"){
-    //  if(typeof(msg)=='undefined') msg = "拖放完成";
-    //  $("#showmsg")[0].innerHTML = msg;
-    //  setTimeout(function(){$('#showmsg').animate({top:0,opacity:'0'},200)},1000);
-    // }else{           
-    //  $("#showmsg")[0].style.opacity = 1;
-    //  $("#showmsg")[0].innerHTML = show;
-    //  setTimeout(function(){$('#showmsg').animate({top:0,opacity:'0'},200)},1500);
-    // }    
+    if(cb) tan.pop(msg,cb);
+    else
+        tan.pop(msg);
 }
 
-function __measureDoc(){      
-    var doch = document.documentElement.clientHeight, docw = document.documentElement.clientWidth,
-    docST = document.documentElement.scrollTop||document.body.scrollTop,
-    docSL = document.documentElement.scrollLeft||document.body.scrollLeft;
-    return {dw:docw,dh:doch,st:docST,sl:docSL};
-};
+// function __measureDoc(){      
+//     var doch = document.documentElement.clientHeight, docw = document.documentElement.clientWidth,
+//     docST = document.documentElement.scrollTop||document.body.scrollTop,
+//     docSL = document.documentElement.scrollLeft||document.body.scrollLeft;
+//     return {dw:docw,dh:doch,st:docST,sl:docSL};
+// };

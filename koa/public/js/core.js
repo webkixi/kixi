@@ -3,261 +3,44 @@
 
 function __arg2arr(args){ return Array.prototype.slice.call(args); }
 function __obj2str(o) {  
-    var r = [];  
-    if (typeof o == "string")  
-        return "\"" + o.replace(/([\'\"\\])/g, "\\$1").replace(/(\n)/g, "\\n").replace(/(\r)/g, "\\r").replace(/(\t)/g, "\\t") + "\"";  
-    if (typeof o == "object") {  
-        for (var i in o)  
-            r.push("\"" + i + "\":" + __obj2str(o[i]));  
-        if (!!document.all && !/^\n?function\s*toString\(\)\s*\{\n?\s*\[native code\]\n?\s*\}\n?\s*$/.test(o.toString)) {  
-            r.push("toString:" + o.toString.toString());  
-        }  
-        r = "{" + r.join() + "}";  
-        return r;  
-    }  
-    return o.toString();  
-}       
-
-//模板替换方法
-function tpl(tpl,jsondata){
-    if(__getClass(tpl)=='String'){
-
-    }
-    
-    if(__getClass(tpl)=='Object'){
-
-    }
-
-    if(__getClass(tpl)=='Array'){
-
-    }
-    // return vg.rpl(tpl,jsondata).gettmp();
-}
-
-var _ctx;
-    function init(context,opts,callback){
-        var ctx = context==window ? context : (function(){ window.context = context; return window.context;})();
-        var cbk = callback;
-        var req;
-        var ajaxitem;
-        var defaults = {
-            url:'',
-            method:'post',
-            data:'',
-            type:'json'
+    (function obj2str(o){
+        var r = [];
+        if(typeof o == "string" || o == null ) {
+        return o;
         }
-
-        //ajax stack priority high
-        var ajaxStack=[];
-        var ajaxVarStack=[];
-        var ajaxResultStack=[];
-
-        //normal stack  priority low
-        var funStack = [];
-        var funVerStack = [];
-        var funResultStack = [];
-
-        var resault={};
-        for(var iii in opts){            
-            if(__getClass(opts[iii])=='Object'){
-                if(opts[iii].jquery){
-                    var ele = opts[iii][0];
-                    // console.log(ele);
-                }else{
-                    req = opts[iii];
-                    if(!req.url||req.url=='') return;
-                    ajaxitem = $.extend({},defaults,req);
-                    ajaxitem.vari = iii;
-                    ajaxStack.push(ajaxitem);
-                    ajaxVarStack.push(iii);
-                }
-            }else if(__getClass(opts[iii])=='Function'){
-                var fun = opts[iii];
-                funStack.push(fun);
-                funVerStack.push(iii);
-                add_action(iii,fun,fun.length);
-            }else if(__getClass(opts[iii])=='Array'){                
-                var ary = opts[iii];                
-                if(__getClass(ary[0])!=='Function') return;                
-                funStack.push(ary);
-                funVerStack.push(iii);
-                add_action(iii,ary,ary[0].length);
-            }
+        if(typeof o == "object"){
+        if(!o.sort){
+        r[0]="{"
+        for(var i in o){
+        r[r.length]=i;
+        r[r.length]=":";
+        r[r.length]=obj2str(o[i]);
+        r[r.length]=",";
         }
-
-        var tmp;
-        function cb(err,data){
-            var ttt;        
-            if(data) {    
-                var vtmp = ajaxVarStack.shift();
-                resault[vtmp] = data;
-                ajaxResultStack.push(data);
-            }
-            if(ajaxStack.length>0){
-                tmp = ajaxStack.shift();
-                runajax(tmp);
-            }else{
-                for(var v in resault){
-                    ctx[v] = resault[v];                
-                }
-                ajaxStack=[];
-                ajaxVarStack=[];
-                ajaxResultStack=[];
-                // resault={};
-
-                if(funVerStack.length>0){                                  
-                    var tfun;
-                    var tprompt;
-                    var doact;
-                    clearTimeout(ttt);
-                    for(var i=0; i<funVerStack.length; i++){
-                        (function(j){
-                            doact = funVerStack[j];
-                            if(__getClass(funStack[j])=='Function'){
-                                ctx[doact] = funStack[j];
-                            }
-                            else if(__getClass(funStack[j])=='Array'){                                
-                                doact = funVerStack[j];
-                                tfun = funStack[j][0];
-                                tprompt = funStack[j].slice(1);
-                                ctx[doact] = tfun;                                
-                            }
-                            if(tprompt&&tprompt.length>0){                         
-                                setTimeout(function(){ do_action(doact,tprompt) }, 17);
-                            }else{                                
-                                setTimeout(function(){ do_action(doact) }, 17);
-                            }
-                        })(i)
-                    }
-                }
-                if(callback) callback(ctx);
-            }
+        r[r.length-1]="}"
+        }else{
+        r[0]="["
+        // alert(o.length);
+        for(var i =0;i<o.length;i++){
+        r[r.length]=obj2str(o[i]);
+        r[r.length]=",";
         }
-
-        function runajax(ttt){            
-            $.ajax({
-                url: ttt.url,
-                dataType: ttt.type,
-                data: ttt.data,
-                type: ttt.method,
-                success: function(data){
-                    if(!data||data=='')
-                        data={};
-                    cb(null,data);
-                },
-                error: function(data){
-                    if(!data||data=='')
-                        data={};
-                    cb(null,data);
-                }
-            });
+        r[r.length-1]="]"
         }
-        // if(ajaxStack.length>0){cb(); } 
-        cb();
-    }
-
-    //hooks
-    var actmap = new HashMap();
-    function do_action(name){
-        var funs=[]; 
-        var tmp;        
-        var argmts = __arg2arr(arguments);               
-        if(actmap.containsKey(name)){
-            funs = actmap.get(name);            
-            if(funs.length>0){                                
-                for(var i=0; i<funs.length; i++){
-                    tmp = funs[i];                     
-                    if(__getClass(tmp.fun)!=='Function') {
-                        if(__getClass(tmp.fun[0])!=='Function') return;
-                        tmp.fun = tmp.fun[0];
-                    }                    
-                    if(tmp.propnum&&tmp.propnum>0){                        
-                        if(argmts.length>2&&argmts.length>tmp.propnum){
-                            argmts = argmts.splice(1,(1+tmp.propnum));
-                        }else{
-                            argmts = argmts.slice(1);
-                        }
-                        tmp.fun.apply(this,argmts);
-                    }else
-                        tmp.fun();
-                }
-            }
+        return r.join("");
         }
-    }
+        return o.toString();
+    })(o);
 
-    function add_action(name,fun,propnum){       
-        if(__getClass(fun)=='Function'||__getClass(fun)=='Array'){        
-            var funs=[];
-            var tmp = {};
-            var hasdefine=false;        
-            propnum = propnum ? propnum : 1;
-            if(actmap.containsKey(name)){
-                funs = actmap.get(name);                
-                for(var j=0; j<funs.length; j++){                    
-                    if(__getClass(fun)=='Array'){                        
-                        if(__obj2str(funs[j].fun)==__obj2str(fun[0])){                                                        
-                            hasdefine=true;
-                        }
-                    }else if(__obj2str(funs[j])==__obj2str(fun)){
-                        hasdefine=true;
-                    }
-                }                
-                if(hasdefine==false){
-                    tmp.fun = fun;
-                    tmp.propnum = propnum;
-                    funs.push(tmp);
-                    actmap.put(name,funs);
-                }
-            }else{                
-                tmp.fun = fun;                
-                tmp.propnum = propnum;
-                funs.push(tmp);
-                actmap.put(name,funs);
-            }
-        }
-    }    
-    
-    var tips = function(show,msg,timeout){
-        var msg_left, msg_top;
-        var docRect = __measureDoc();
-        var sl = docRect.sl;
-        var st = docRect.st;
-        var cw = docRect.dw;
-        var ch = docRect.dh;
-
-        function newmsg(mm){
-            var tip = document.createElement('div');
-            var subtip = document.createElement('div');
-            tip.className = 'showmsg';
-            tip.style.cssText = 'display:none;z-index:10030;width:100%;text-align:center; margin-top:10px;';
-            subtip.style.cssText = 'width:100%;height:100%;color:#fff;background-color:#4ba2f9;line-height:40px;font-size:16px;';
-            if(typeof(mm)=='undefined') mm = "请稍候。。。";
-            subtip.innerHTML = mm;
-            tip.appendChild(subtip);
-            return tip;
-        }
-
-        function pushmsg(mm){
-            clearTimeout(ggg);
-            msg_left = Math.round((parseInt(cw)-300)/2);
-
-            var msgitem = new newmsg(mm);
-            $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
-            $('#msgcontainer').append(msgitem);
-
-            msgitem.style.left = msg_left+'px';
-            $(msgitem).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
-            var ggg = setTimeout(function(){
-                $(msgitem).remove();
-                if($('.showmsg').length==0) $('#msgcontainer').remove();
-            }, 3000);
-        }
-
-        init(this,{
-            ttips: [pushmsg,msg]
-        });        
-    }   
-
+} 
+function __measureDoc(){      
+    var 
+    doch = document.documentElement.clientHeight||document.body.clientHeight, 
+    docw = document.documentElement.clientWidth||document.body.clientWidth,
+    docST = document.documentElement.scrollTop||document.body.scrollTop,
+    docSL = document.documentElement.scrollLeft||document.body.scrollLeft;
+    return {dw:docw,dh:doch,st:docST,sl:docSL};
+};
 
 function HashMap() {  
     var size = 0;  
@@ -346,4 +129,305 @@ function HashMap() {
     this.toString = function () {  
         return __obj2str(entry);  
     };      
-} 
+}   
+
+//模板替换方法
+function tpl(tpl,jsondata){
+    if(__getClass(tpl)=='String'){
+
+    }
+    
+    if(__getClass(tpl)=='Object'){
+
+    }
+
+    if(__getClass(tpl)=='Array'){
+
+    }
+    // return vg.rpl(tpl,jsondata).gettmp();
+}
+
+var _ctx;
+function init(context,opts,callback){
+    var ctx = context==window ? context : (function(){ window.context = context; return window.context;})();
+    var cbk = callback;
+    var req;
+    var ajaxitem;
+    var defaults = {
+        url:'',
+        method:'post',
+        data:'',
+        type:'json'
+    }
+
+    //ajax stack priority high
+    var ajaxStack=[];
+    var ajaxVarStack=[];
+    var ajaxResultStack=[];
+
+    //normal stack  priority low
+    var funStack = [];
+    var funVerStack = [];
+    var funResultStack = [];
+
+    var resault={};
+    for(var iii in opts){            
+        if(__getClass(opts[iii])=='Object'){
+            if(opts[iii].jquery){
+                var ele = opts[iii][0];
+                // console.log(ele);
+            }else{
+                req = opts[iii];
+                if(!req.url||req.url=='') return;
+                ajaxitem = $.extend({},defaults,req);
+                ajaxitem.vari = iii;
+                ajaxStack.push(ajaxitem);
+                ajaxVarStack.push(iii);
+            }
+        }else if(__getClass(opts[iii])=='Function'){
+            var fun = opts[iii];
+            funStack.push(fun);
+            funVerStack.push(iii);
+            add_action(iii,fun,fun.length,ctx);
+        }else if(__getClass(opts[iii])=='Array'){                
+            var ary = opts[iii];                
+            if(__getClass(ary[0])!=='Function') return;                
+            funStack.push(ary);
+            funVerStack.push(iii);
+            if(iii!=='null') add_action(iii,ary,ary[0].length,ctx);
+        }else{
+            ctx[iii] = opts[iii];
+        }
+    }
+
+    var tmp;
+    function cb(err,data){
+        if(data) {    
+            var vtmp = ajaxVarStack.shift();
+            resault[vtmp] = data;
+            ajaxResultStack.push(data);
+        }
+        if(ajaxStack.length>0){
+            tmp = ajaxStack.shift();
+            runajax(tmp);
+        }else{
+            for(var v in resault){
+                ctx[v] = resault[v];                
+            }
+            ajaxStack=[];
+            ajaxVarStack=[];
+            ajaxResultStack=[];
+            // resault={};
+
+            if(funVerStack.length>0){                                  
+                var tfun;
+                var tprompt;
+                var doact;
+                for(var i=0; i<funVerStack.length; i++){
+                    (function(j){
+                        doact = funVerStack[j];
+                        if(__getClass(funStack[j])=='Function'){
+                            ctx[doact] = funStack[j];
+                        }
+                        else if(__getClass(funStack[j])=='Array'){
+                            if(doact=='null') {
+                                var ary = funStack[j];
+                                for(var kkk=0; kkk<ary.length; kkk++){
+                                    if(__getClass(ary[kkk])!=='Function'){
+                                        tips('show','null后的数组元素必须为函数');
+                                        return false;
+                                    }
+                                    (function(itr){
+                                        ary[itr].apply(ctx);
+                                    })(kkk)
+                                }
+                            } else {
+                                doact = funVerStack[j];
+                                tfun = funStack[j][0];
+                                tprompt = funStack[j].slice(1);
+                                ctx[doact] = tfun;
+                            }
+                        }
+                        if(tprompt&&tprompt.length>0){  
+                            do_action(doact,tprompt);                       
+                        }else{   
+                            do_action(doact)                             
+                        }
+                    })(i)
+                }
+            }
+            if(callback) callback.apply(ctx);
+        }
+    }
+
+    function runajax(ttt){            
+        $.ajax({
+            url: ttt.url,
+            dataType: ttt.type,
+            data: ttt.data,
+            type: ttt.method,
+            success: function(data){
+                if(!data||data=='')
+                    data={};
+                cb(null,data);
+            },
+            error: function(data){
+                if(!data||data=='')
+                    data={};
+                cb(null,data);
+            }
+        });
+    }
+    cb();
+}
+
+//hooks
+var actmap = new HashMap();
+function do_action(name){
+    var funs=[]; 
+    var tmp;
+    var tmpary = [];
+    var withargs;
+    var argmts = __arg2arr(arguments);               
+    if(actmap.containsKey(name)){
+        funs = actmap.get(name);            
+        if(funs.length>0){                                
+            for(var i=0; i<funs.length; i++){
+                tmp = funs[i];                        
+                if(__getClass(tmp.fun)!=='Function') {                    
+                    if(__getClass(tmp.fun[0])!=='Function') return;                    
+                    withargs = tmp.fun[1];
+                    if(__getClass(withargs)!=='Array'){
+                        tmpary.push(withargs);
+                        withargs = tmpary;
+                    }
+                    tmp.fun = tmp.fun[0];
+                }                    
+                if(tmp.propnum&&tmp.propnum>0){                        
+                    if(withargs){
+                        argmts = withargs;
+                    }else{
+                        argmts = argmts.splice(1,(1+tmp.propnum));
+                    }
+                    // if(argmts.length>2&&argmts.length>tmp.propnum){
+                    //     argmts = argmts.splice(1,(1+tmp.propnum));
+                    // }else{
+                    //     argmts = argmts.slice(1);
+                    // }
+                    if(tmp.ctx=='ve')tmp.ctx = window;
+                    tmp.ctx[name] = tmp.fun.apply(tmp.ctx,argmts);
+                }else
+                    tmp.ctx[name] = tmp.fun.apply(tmp.ctx)  //tmp.fun();
+            }
+        }
+    }
+}
+
+//
+function add_action(name,fun,propnum,ctx){
+    clearTimeout(timeAddAction);
+
+    function addAct(){
+        if(__getClass(fun)=='Function'||__getClass(fun)=='Array'){
+            var funs=[];
+            var tmp = {};
+            var hasdefine=false;               
+            if(!ctx||ctx==window)ctx='ve';                        
+            propnum = propnum ? propnum == 0 ? 1 : propnum : 1;
+            if(actmap.containsKey(name)){
+                funs = actmap.get(name);                
+                for(var j=0; j<funs.length; j++){                    
+                    console.log(funs[j].toString());   
+                    if(__getClass(fun)=='Array'){                              
+                        if(__obj2str(funs[j].fun)==__obj2str(fun[0])){
+                            hasdefine=true;
+                        }
+                    }else if(__obj2str(funs[j])==__obj2str(fun)){
+                        hasdefine=true;
+                    }
+                }                
+                if(hasdefine==false){
+                    tmp.fun = fun;
+                    tmp.propnum = propnum;
+                    tmp.ctx = ctx;
+                    funs.push(tmp);
+                    actmap.put(name,funs);
+                }
+            }else{                
+                tmp.fun = fun;                                
+                tmp.propnum = propnum;
+                tmp.ctx = ctx;                
+                funs.push(tmp);                
+                actmap.put(name,funs);
+            }
+        }
+    }
+
+    var timeAddAction = setTimeout(addAct, 200);
+}    
+
+/*消息弹出
+* @ show  string 后续扩展，必须有
+* @ msg  string  弹出消息内容，必须
+* @ [timeout] number 可不用写
+*/
+var tipsbox = function(){
+    var msg_left, msg_top;
+    var docRect = __measureDoc();
+    var scrollleft = docRect.sl;
+    var scrolltop = docRect.st;
+    var clientwidth = docRect.dw;
+    var clientheight = docRect.dh;  
+
+    this.pop = function(mmm,cb){                    
+        // init(this,{
+        //     tipsTpl : [newmsg,mmm]
+        //     ,tipsBox : msgbox
+        //     ,null: [pushmsg] 
+        // });
+        //原始写法                     
+        pushmsg.call(this,mmm);
+        var args = __arg2arr(arguments);
+        args = args.slice(2);
+        if(cb){
+            // add_action('tipsbox',[cb,kkkccc],cb.length,this);
+            add_action('tipsbox',cb,cb.length,this);
+        }
+    }
+
+    //新建消息实例
+    this.tipsItem =function(){            
+        var tip = document.createElement('div');
+        var subtip = document.createElement('div');
+        tip.className = 'showmsg';
+        tip.style.cssText = 'display:none;width:100%;text-align:center; margin-top:10px;color:#fff;line-height:40px;font-size:16px;background-color:#4ba2f9;';
+        return tip;
+    }
+
+    this.tipsBox=function(){
+        msg_left = Math.round((parseInt(clientwidth)-300)/2);
+        $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="z-Index:10030;width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
+        return $('#msgcontainer')[0];
+    }
+
+    //新建消息实例容器
+    function pushmsg(mm){        
+        var item = this.tipsItem();
+        var box = this.tipsBox();
+        item.innerHTML = mm;
+        box.appendChild(item);
+        this.anim(item,box);
+    }
+
+    this.anim=function(item,container){        
+        clearTimeout(ggg);
+        $(item).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
+        var ggg = setTimeout(function(){
+            $(item).remove();
+            if($('.showmsg').length==0) $(container).remove();
+            do_action('tipsbox');
+        }, 3000);
+    }    
+}   
+
+window.tips = new tipsbox();
