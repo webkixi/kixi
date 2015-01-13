@@ -297,19 +297,20 @@ define('global/g', ['common/veget'], function(vg) {
                 var fun = opts[iii];
                 funStack.push(fun);
                 funVerStack.push(iii);
-                add_action(iii,fun,fun.length);
+                add_action(iii,fun,fun.length,ctx);
             }else if(__getClass(opts[iii])=='Array'){                
                 var ary = opts[iii];                
                 if(__getClass(ary[0])!=='Function') return;                
                 funStack.push(ary);
                 funVerStack.push(iii);
-                add_action(iii,ary,ary[0].length);
+                if(iii!=='null') add_action(iii,ary,ary[0].length,ctx);
+            }else{
+                ctx[iii] = opts[iii];
             }
         }
 
         var tmp;
         function cb(err,data){
-            var ttt;        
             if(data) {    
                 var vtmp = ajaxVarStack.shift();
                 resault[vtmp] = data;
@@ -331,28 +332,40 @@ define('global/g', ['common/veget'], function(vg) {
                     var tfun;
                     var tprompt;
                     var doact;
-                    clearTimeout(ttt);
                     for(var i=0; i<funVerStack.length; i++){
                         (function(j){
                             doact = funVerStack[j];
                             if(__getClass(funStack[j])=='Function'){
                                 ctx[doact] = funStack[j];
                             }
-                            else if(__getClass(funStack[j])=='Array'){                                
-                                doact = funVerStack[j];
-                                tfun = funStack[j][0];
-                                tprompt = funStack[j].slice(1);
-                                ctx[doact] = tfun;                                
+                            else if(__getClass(funStack[j])=='Array'){
+                                if(doact=='null') {
+                                    var ary = funStack[j];
+                                    for(var kkk=0; kkk<ary.length; kkk++){
+                                        if(__getClass(ary[kkk])!=='Function'){
+                                            tips('show','null后的数组元素必须为函数');
+                                            return false;
+                                        }
+                                        (function(itr){
+                                            ary[itr].apply(ctx);
+                                        })(kkk)
+                                    }
+                                } else {
+                                    doact = funVerStack[j];
+                                    tfun = funStack[j][0];
+                                    tprompt = funStack[j].slice(1);
+                                    ctx[doact] = tfun;
+                                }
                             }
-                            if(tprompt&&tprompt.length>0){                         
-                                setTimeout(function(){ do_action(doact,tprompt) }, 17);
-                            }else{                                
-                                setTimeout(function(){ do_action(doact) }, 17);
+                            if(tprompt&&tprompt.length>0){  
+                                do_action(doact,tprompt);                       
+                            }else{   
+                                do_action(doact)                             
                             }
                         })(i)
                     }
                 }
-                if(callback) callback(ctx);
+                if(callback) callback.apply(ctx);
             }
         }
 
@@ -374,7 +387,6 @@ define('global/g', ['common/veget'], function(vg) {
                 }
             });
         }
-        // if(ajaxStack.length>0){cb(); } 
         cb();
     }
 
@@ -399,19 +411,22 @@ define('global/g', ['common/veget'], function(vg) {
                         }else{
                             argmts = argmts.slice(1);
                         }
-                        tmp.fun.apply(this,argmts);
+                        if(tmp.ctx=='ve')tmp.ctx = window;
+                        tmp.ctx[name] = tmp.fun.apply(tmp.ctx,argmts);
                     }else
-                        tmp.fun();
+                        tmp.ctx[name] = tmp.fun.apply(tmp.ctx)  //tmp.fun();
                 }
             }
         }
     }
 
-    function add_action(name,fun,propnum){       
-        if(__getClass(fun)=='Function'||__getClass(fun)=='Array'){        
+    //
+    function add_action(name,fun,propnum,ctx){
+        if(__getClass(fun)=='Function'||__getClass(fun)=='Array'){
             var funs=[];
             var tmp = {};
-            var hasdefine=false;        
+            var hasdefine=false;               
+            if(!ctx||ctx==window)ctx='ve';                        
             propnum = propnum ? propnum : 1;
             if(actmap.containsKey(name)){
                 funs = actmap.get(name);                
@@ -427,27 +442,52 @@ define('global/g', ['common/veget'], function(vg) {
                 if(hasdefine==false){
                     tmp.fun = fun;
                     tmp.propnum = propnum;
+                    tmp.ctx = ctx;
                     funs.push(tmp);
                     actmap.put(name,funs);
                 }
             }else{                
                 tmp.fun = fun;                
                 tmp.propnum = propnum;
+                tmp.ctx = ctx;
                 funs.push(tmp);
                 actmap.put(name,funs);
             }
         }
     }    
     
-    var tips = function(show,msg,timeout){
+    /*消息弹出
+    * @ show  string 后续扩展，必须有
+    * @ msg  string  弹出消息内容，必须
+    * @ [timeout] number 可不用写
+    */
+    var msgbox = function(){
         var msg_left, msg_top;
         var docRect = __measureDoc();
-        var sl = docRect.sl;
-        var st = docRect.st;
-        var cw = docRect.dw;
-        var ch = docRect.dh;
+        var scrollleft = docRect.sl;
+        var scrolltop = docRect.st;
+        var clientwidth = docRect.dw;
+        var clientheight = docRect.dh;
 
-        function newmsg(mm){
+        // if(!show)show='show';
+        
+        // this.tip;
+        // this.tipbox;
+
+        this.pop = function(mmm){                        
+            // init(this,{
+            //     tipsTpl : [newmsg,mmm]
+            //     ,tipsBox : msgbox
+            //     ,null: [pushmsg] 
+            // });
+            //原始写法
+            this.tipsTpl = newmsg(mmm);
+            this.tipsBox = msgbox();
+            pushmsg.call(this);
+        }
+
+        //新建消息实例
+        function newmsg(mm){            
             var tip = document.createElement('div');
             var subtip = document.createElement('div');
             tip.className = 'showmsg';
@@ -459,28 +499,52 @@ define('global/g', ['common/veget'], function(vg) {
             return tip;
         }
 
-        function pushmsg(mm){
-            clearTimeout(ggg);
-            msg_left = Math.round((parseInt(cw)-300)/2);
-
-            var msgitem = new newmsg(mm);
+        function msgbox(){
+            msg_left = Math.round((parseInt(clientwidth)-300)/2);
             $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
-            $('#msgcontainer').append(msgitem);
+            return $('#msgcontainer')[0];
+        }
 
-            msgitem.style.left = msg_left+'px';
-            $(msgitem).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
+        //新建消息实例容器
+        function pushmsg(){
+            var msgitem = this.tipsTpl;            
+            this.tipsBox.appendChild(msgitem);
+            this.anim(msgitem,this.tipsBox);            
+        }
+
+        this.anim=function(item,container){
+            clearTimeout(ggg);
+            $(item).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
             var ggg = setTimeout(function(){
-                $(msgitem).remove();
-                if($('.showmsg').length==0) $('#msgcontainer').remove();
+                $(item).remove();
+                if($('.showmsg').length==0) $(container).remove();
             }, 3000);
         }
 
-        init(this,{
-            ttips: [pushmsg,msg]
-        });        
+        //新建消息实例容器
+        // function pushmsg(mm){
+        //     clearTimeout(ggg);
+        //     msg_left = Math.round((parseInt(clientwidth)-300)/2);
+        //     var msgitem = new newmsg();
+        //     msgitem.innerHTML = mm;
+        //     $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
+        //     $('#msgcontainer').append(msgitem);
+
+        //     msgitem.style.left = msg_left+'px';
+        //     $(msgitem).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
+        //     var ggg = setTimeout(function(){
+        //         $(msgitem).remove();
+        //         if($('.showmsg').length==0) $('#msgcontainer').remove();
+        //     }, 3000);
+        // }
+
+        //执行消息实例
+        // init(this,{
+        //     ttips: [pushmsg,msg]
+        // });        
     }   
 
-    // window.tips = tips;
+    window.tips = new msgbox();
     
     //not recommended
     exports.regi = regi;
