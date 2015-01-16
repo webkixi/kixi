@@ -76,7 +76,7 @@ function tanbox(msg,cb){
         $(container).fadeIn(1000);
     };
 
-    if(cb) tan.pop(msg,cb);
+    if(cb) tan.pop(msg,'',cb);
     else
         tan.pop(msg);
 }

@@ -12,10 +12,10 @@ define('global/g', ['common/veget'], function(vg) {
 
         var userinfo_top_tmp_login = '<div class="userinfo-top"><span>欢迎您,</span><a data-interaction="global|tuserinfo|1|1" href="{{ve.uc_account}}" class="c-reg">{{ve.user_name}}</a>\
                             <a data-interaction="global|tuserinfo|1|2" href="{{ve.logout}}">退出</a><i class="i-line"></i>\
-                            <a data-interaction="global|tuserinfo|1|4" href="{{ve.uc_order}}">我的唯一</a><i class="i-line"></i></div>';
+                            <a data-interaction="global|tuserinfo|1|3" href="{{ve.uc_order}}">我的唯一</a><i class="i-line"></i></div>';
         var userinfo_top_tmp = '<div class="webcome-ve"><span>欢迎来到唯一优品，请</span><a data-interaction="global|tuserinfo|1|1"  href="{{ve.login}}" title="登录">登录</a><i class="i-line"></i>\
                             <a data-interaction="global|tuserinfo|1|2"  href="{{ve.register}}" class="c-reg" title="注册">免费注册</a><i class="i-line"></i>\
-                            <a data-interaction="global|tuserinfo|1|4"  href="{{ve.uc_order}}">我的唯一</a><i class="i-line"></i></div>';
+                            <a data-interaction="global|tuserinfo|1|3"  href="{{ve.uc_order}}">我的唯一</a><i class="i-line"></i></div>';
         
         userinfo = (u&&u.id>0) ? userinfo_top_tmp_login : userinfo_top_tmp;
         var userinfo = vg.rpl(userinfo,u).gettmp();
@@ -233,26 +233,40 @@ define('global/g', ['common/veget'], function(vg) {
             return __obj2str(entry);  
         };
     }
-
     /*
     *@ 对象转换成字符串
     *  o - json obj
     */
-    __obj2str = function (o) {  
-        var r = [];  
-        if (typeof o == "string")  
-            return "\"" + o.replace(/([\'\"\\])/g, "\\$1").replace(/(\n)/g, "\\n").replace(/(\r)/g, "\\r").replace(/(\t)/g, "\\t") + "\"";  
-        if (typeof o == "object") {  
-            for (var i in o)  
-                r.push("\"" + i + "\":" + __obj2str(o[i]));  
-            if (!!document.all && !/^\n?function\s*toString\(\)\s*\{\n?\s*\[native code\]\n?\s*\}\n?\s*$/.test(o.toString)) {  
-                r.push("toString:" + o.toString.toString());  
-            }  
-            r = "{" + r.join() + "}";  
-            return r;  
-        }  
-        return o.toString();  
-    }
+    function __obj2str(o) {  
+        (function obj2str(o){
+            var r = [];
+            if(typeof o == "string" || o == null ) {
+                return o;
+            }
+            if(typeof o == "object"){
+                if(!o.sort){
+                    r[0]="{"
+                    for(var i in o){
+                        r[r.length]=i;
+                        r[r.length]=":";
+                        r[r.length]=obj2str(o[i]);
+                        r[r.length]=",";
+                    }
+                    r[r.length-1]="}"
+                }else{
+                    r[0]="["
+                    // alert(o.length);
+                    for(var i =0;i<o.length;i++){
+                        r[r.length]=obj2str(o[i]);
+                        r[r.length]=",";
+                    }
+                    r[r.length-1]="]"
+                }
+                return r.join("");
+            }
+            return o.toString();
+        })(o);
+    } 
 
     function __arg2arr(args){ return Array.prototype.slice.call(args); }
 
@@ -343,12 +357,15 @@ define('global/g', ['common/veget'], function(vg) {
                                     var ary = funStack[j];
                                     for(var kkk=0; kkk<ary.length; kkk++){
                                         if(__getClass(ary[kkk])!=='Function'){
-                                            tips('show','null后的数组元素必须为函数');
+                                            // tips.pop('null后的数组元素必须为函数','alert');
+                                            tips('null后的数组元素必须为函数','alert');
                                             return false;
                                         }
+                                    }
+                                    for(var kkk=0; kkk<ary.length; kkk++){
                                         (function(itr){
                                             ary[itr].apply(ctx);
-                                        })(kkk)
+                                        })(kkk);
                                     }
                                 } else {
                                     doact = funVerStack[j];
@@ -391,26 +408,44 @@ define('global/g', ['common/veget'], function(vg) {
     }
 
     //hooks
+    /*
+    * 执行hooks方法
+    * des: 执行add_action添加的方法
+    * @name 对应add_action的name
+    * @arguments 执行hooks name对应方法所需的参数
+    */
     var actmap = new HashMap();
     function do_action(name){
         var funs=[]; 
-        var tmp;        
+        var tmp;
+        var tmpary = [];
+        var withargs;
         var argmts = __arg2arr(arguments);               
         if(actmap.containsKey(name)){
             funs = actmap.get(name);            
             if(funs.length>0){                                
                 for(var i=0; i<funs.length; i++){
-                    tmp = funs[i];                     
-                    if(__getClass(tmp.fun)!=='Function') {
-                        if(__getClass(tmp.fun[0])!=='Function') return;
+                    tmp = funs[i];                        
+                    if(__getClass(tmp.fun)!=='Function') {                    
+                        if(__getClass(tmp.fun[0])!=='Function') return;                    
+                        withargs = tmp.fun[1];
+                        if(__getClass(withargs)!=='Array'){
+                            tmpary.push(withargs);
+                            withargs = tmpary;
+                        }
                         tmp.fun = tmp.fun[0];
                     }                    
                     if(tmp.propnum&&tmp.propnum>0){                        
-                        if(argmts.length>2&&argmts.length>tmp.propnum){
-                            argmts = argmts.splice(1,(1+tmp.propnum));
+                        if(withargs){
+                            argmts = withargs;
                         }else{
-                            argmts = argmts.slice(1);
+                            argmts = argmts.splice(1,(1+tmp.propnum));
                         }
+                        // if(argmts.length>2&&argmts.length>tmp.propnum){
+                        //     argmts = argmts.splice(1,(1+tmp.propnum));
+                        // }else{
+                        //     argmts = argmts.slice(1);
+                        // }
                         if(tmp.ctx=='ve')tmp.ctx = window;
                         tmp.ctx[name] = tmp.fun.apply(tmp.ctx,argmts);
                     }else
@@ -420,133 +455,100 @@ define('global/g', ['common/veget'], function(vg) {
         }
     }
 
-    //
+    /*
+    * 添加hooks方法
+    * @name string hooks方法
+    * @fun name对应的方法
+    * @num  fun方法的参数个数
+    * @ctx context上下文
+    *
+    * SAMPLE 1
+    * core.add_action('aaa',fun,3,window);
+    * 
+    * SAMPLE 2
+    * var ctx = {'a':1,'b':2}
+    * core.add_action('bbb',fun,2,ctx);
+    */
     function add_action(name,fun,propnum,ctx){
-        if(__getClass(fun)=='Function'||__getClass(fun)=='Array'){
-            var funs=[];
-            var tmp = {};
-            var hasdefine=false;               
-            if(!ctx||ctx==window)ctx='ve';                        
-            propnum = propnum ? propnum : 1;
-            if(actmap.containsKey(name)){
-                funs = actmap.get(name);                
-                for(var j=0; j<funs.length; j++){                    
-                    if(__getClass(fun)=='Array'){                        
-                        if(__obj2str(funs[j].fun)==__obj2str(fun[0])){                                                        
+        clearTimeout(timeAddAction);
+
+        function addAct(){
+            if(__getClass(fun)=='Function'||__getClass(fun)=='Array'){
+                var funs=[];
+                var tmp = {};
+                var hasdefine=false;               
+                if(!ctx||ctx==window)ctx='ve';                        
+                propnum = propnum ? propnum == 0 ? 1 : propnum : 1;
+                if(actmap.containsKey(name)){
+                    funs = actmap.get(name);                
+                    for(var j=0; j<funs.length; j++){                    
+                        console.log(funs[j].toString());   
+                        if(__getClass(fun)=='Array'){                              
+                            if(__obj2str(funs[j].fun)==__obj2str(fun[0])){
+                                hasdefine=true;
+                            }
+                        }else if(__obj2str(funs[j])==__obj2str(fun)){
                             hasdefine=true;
                         }
-                    }else if(__obj2str(funs[j])==__obj2str(fun)){
-                        hasdefine=true;
+                    }                
+                    if(hasdefine==false){
+                        tmp.fun = fun;
+                        tmp.propnum = propnum;
+                        tmp.ctx = ctx;
+                        funs.push(tmp);
+                        actmap.put(name,funs);
                     }
-                }                
-                if(hasdefine==false){
-                    tmp.fun = fun;
+                }else{                
+                    tmp.fun = fun;                                
                     tmp.propnum = propnum;
-                    tmp.ctx = ctx;
-                    funs.push(tmp);
+                    tmp.ctx = ctx;                
+                    funs.push(tmp);                
                     actmap.put(name,funs);
                 }
-            }else{                
-                tmp.fun = fun;                
-                tmp.propnum = propnum;
-                tmp.ctx = ctx;
-                funs.push(tmp);
-                actmap.put(name,funs);
             }
         }
+
+        var timeAddAction = setTimeout(addAct, 200);
     }    
-    
-    /*消息弹出
-    * @ show  string 后续扩展，必须有
-    * @ msg  string  弹出消息内容，必须
-    * @ [timeout] number 可不用写
+
+    /*
+    * 消息弹出抽象函数
+    * 实例实现 tipsItem / tipsBox / anim
     */
-    var msgbox = function(){
-        var msg_left, msg_top;
-        var docRect = __measureDoc();
-        var scrollleft = docRect.sl;
-        var scrolltop = docRect.st;
-        var clientwidth = docRect.dw;
-        var clientheight = docRect.dh;
-
-        // if(!show)show='show';
-        
-        // this.tip;
-        // this.tipbox;
-
-        this.pop = function(mmm){                        
-            // init(this,{
-            //     tipsTpl : [newmsg,mmm]
-            //     ,tipsBox : msgbox
-            //     ,null: [pushmsg] 
-            // });
-            //原始写法
-            this.tipsTpl = newmsg(mmm);
-            this.tipsBox = msgbox();
-            pushmsg.call(this);
+    var tipsbox = function(){
+        this.pop = function(mmm,stat,cb){
+            if(!stat)stat='normal';
+            pushmsg.call(this,mmm,stat);
+            var args = __arg2arr(arguments);
+            args = args.slice(3);
+            if(cb){
+                // add_action('tipsbox',[cb,kkkccc],cb.length,this);
+                add_action('do_tipsbox',cb,cb.length,this);
+            }
         }
 
-        //新建消息实例
-        function newmsg(mm){            
-            var tip = document.createElement('div');
-            var subtip = document.createElement('div');
-            tip.className = 'showmsg';
-            tip.style.cssText = 'display:none;z-index:10030;width:100%;text-align:center; margin-top:10px;';
-            subtip.style.cssText = 'width:100%;height:100%;color:#fff;background-color:#4ba2f9;line-height:40px;font-size:16px;';
-            if(typeof(mm)=='undefined') mm = "请稍候。。。";
-            subtip.innerHTML = mm;
-            tip.appendChild(subtip);
-            return tip;
+        //新建消息实例，可定制
+        this.tipsItem = function(stat){};
+
+        //消息实例容器，可定制
+        this.tipsBox = function(stat){};
+
+        //消息动画 实例化后必须定制
+        this.anim = function(item,container){ if(!item) return;};
+
+        //组合执行方法
+        function pushmsg(mm,stat){
+            var item = this.tipsItem(stat);
+            var box = this.tipsBox(stat);
+            item.innerHTML = mm;
+            box.appendChild(item);
+            this.anim(item,box);
+            return;
         }
-
-        function msgbox(){
-            msg_left = Math.round((parseInt(clientwidth)-300)/2);
-            $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
-            return $('#msgcontainer')[0];
-        }
-
-        //新建消息实例容器
-        function pushmsg(){
-            var msgitem = this.tipsTpl;            
-            this.tipsBox.appendChild(msgitem);
-            this.anim(msgitem,this.tipsBox);            
-        }
-
-        this.anim=function(item,container){
-            clearTimeout(ggg);
-            $(item).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
-            var ggg = setTimeout(function(){
-                $(item).remove();
-                if($('.showmsg').length==0) $(container).remove();
-            }, 3000);
-        }
-
-        //新建消息实例容器
-        // function pushmsg(mm){
-        //     clearTimeout(ggg);
-        //     msg_left = Math.round((parseInt(clientwidth)-300)/2);
-        //     var msgitem = new newmsg();
-        //     msgitem.innerHTML = mm;
-        //     $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
-        //     $('#msgcontainer').append(msgitem);
-
-        //     msgitem.style.left = msg_left+'px';
-        //     $(msgitem).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
-        //     var ggg = setTimeout(function(){
-        //         $(msgitem).remove();
-        //         if($('.showmsg').length==0) $('#msgcontainer').remove();
-        //     }, 3000);
-        // }
-
-        //执行消息实例
-        // init(this,{
-        //     ttips: [pushmsg,msg]
-        // });        
-    }   
-
-    window.tips = new msgbox();
     
-    //not recommended
+    }
+    
+    //not recommended old method
     exports.regi = regi;
     exports.use = use;
     exports.regiOne = regiOne;
@@ -558,9 +560,9 @@ define('global/g', ['common/veget'], function(vg) {
     
     //pull remote data
     exports.init = init;
-    exports.tpl = tpl;
+    exports.tpl = tpl;    
 
-    exports.tips = tips;
+    exports.tipsbox = tipsbox;
 
     exports.veget = vg;
 

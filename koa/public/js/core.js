@@ -3,36 +3,35 @@
 
 function __arg2arr(args){ return Array.prototype.slice.call(args); }
 function __obj2str(o) {  
-    (function obj2str(o){
-        var r = [];
-        if(typeof o == "string" || o == null ) {
-        return o;
-        }
-        if(typeof o == "object"){
-        if(!o.sort){
-        r[0]="{"
-        for(var i in o){
-        r[r.length]=i;
-        r[r.length]=":";
-        r[r.length]=obj2str(o[i]);
-        r[r.length]=",";
-        }
-        r[r.length-1]="}"
-        }else{
-        r[0]="["
-        // alert(o.length);
-        for(var i =0;i<o.length;i++){
-        r[r.length]=obj2str(o[i]);
-        r[r.length]=",";
-        }
-        r[r.length-1]="]"
-        }
-        return r.join("");
-        }
-        return o.toString();
-    })(o);
-
-} 
+        (function obj2str(o){
+            var r = [];
+            if(typeof o == "string" || o == null ) {
+                return o;
+            }
+            if(typeof o == "object"){
+                if(!o.sort){
+                    r[0]="{"
+                    for(var i in o){
+                        r[r.length]=i;
+                        r[r.length]=":";
+                        r[r.length]=obj2str(o[i]);
+                        r[r.length]=",";
+                    }
+                    r[r.length-1]="}"
+                }else{
+                    r[0]="["
+                    // alert(o.length);
+                    for(var i =0;i<o.length;i++){
+                        r[r.length]=obj2str(o[i]);
+                        r[r.length]=",";
+                    }
+                    r[r.length-1]="]"
+                }
+                return r.join("");
+            }
+            return o.toString();
+        })(o);
+    } 
 function __measureDoc(){      
     var 
     doch = document.documentElement.clientHeight||document.body.clientHeight, 
