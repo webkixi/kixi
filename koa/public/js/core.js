@@ -3,42 +3,51 @@
 
 function __arg2arr(args){ return Array.prototype.slice.call(args); }
 function __obj2str(o) {  
-        (function obj2str(o){
-            var r = [];
-            if(typeof o == "string" || o == null ) {
-                return o;
-            }
-            if(typeof o == "object"){
-                if(!o.sort){
-                    r[0]="{"
-                    for(var i in o){
-                        r[r.length]=i;
-                        r[r.length]=":";
-                        r[r.length]=obj2str(o[i]);
-                        r[r.length]=",";
-                    }
-                    r[r.length-1]="}"
-                }else{
-                    r[0]="["
-                    // alert(o.length);
-                    for(var i =0;i<o.length;i++){
-                        r[r.length]=obj2str(o[i]);
-                        r[r.length]=",";
-                    }
-                    r[r.length-1]="]"
+    (function obj2str(o){
+        var r = [];
+        if(typeof o == "string" || o == null ) {
+            return o;
+        }
+        if(typeof o == "object"){
+            if(!o.sort){
+                r[0]="{"
+                for(var i in o){
+                    r[r.length]=i;
+                    r[r.length]=":";
+                    r[r.length]=obj2str(o[i]);
+                    r[r.length]=",";
                 }
-                return r.join("");
+                r[r.length-1]="}"
+            }else{
+                r[0]="["
+                // alert(o.length);
+                for(var i =0;i<o.length;i++){
+                    r[r.length]=obj2str(o[i]);
+                    r[r.length]=",";
+                }
+                r[r.length-1]="]"
             }
-            return o.toString();
-        })(o);
-    } 
+            return r.join("");
+        }
+        return o.toString();
+    })(o);
+} 
 function __measureDoc(){      
-    var 
-    doch = document.documentElement.clientHeight||document.body.clientHeight, 
-    docw = document.documentElement.clientWidth||document.body.clientWidth,
-    docST = document.documentElement.scrollTop||document.body.scrollTop,
-    docSL = document.documentElement.scrollLeft||document.body.scrollLeft;
-    return {dw:docw,dh:doch,st:docST,sl:docSL};
+    if(!jQuery.support.opacity){
+        var 
+        doch = document.documentElement.clientHeight||document.body.clientHeight, 
+        docw = document.documentElement.clientWidth||document.body.clientWidth,
+        docST = document.documentElement.scrollTop||document.body.scrollTop,
+        docSL = document.documentElement.scrollLeft||document.body.scrollLeft;
+        return {dw:docw,dh:doch,st:docST,sl:docSL};
+    }else{
+        var 
+        doch = document.body.clientHeight||document.documentElement.clientHeight, 
+        docw = document.body.clientWidth||document.documentElement.clientWidth,
+        docST = document.body.scrollTop||document.documentElement.scrollTop,
+        docSL = document.body.scrollLeft||document.documentElement.scrollLeft;
+        return {dw:docw,dh:doch,st:docST,sl:docSL};
+    }
 };
 
 function HashMap() {  
@@ -233,12 +242,15 @@ function init(context,opts,callback){
                                 var ary = funStack[j];
                                 for(var kkk=0; kkk<ary.length; kkk++){
                                     if(__getClass(ary[kkk])!=='Function'){
-                                        tips('show','null后的数组元素必须为函数');
+                                        // tips.pop('null后的数组元素必须为函数','alert');
+                                        tips('null后的数组元素必须为函数','alert');
                                         return false;
                                     }
+                                }
+                                for(var kkk=0; kkk<ary.length; kkk++){
                                     (function(itr){
                                         ary[itr].apply(ctx);
-                                    })(kkk)
+                                    })(kkk);
                                 }
                             } else {
                                 doact = funVerStack[j];
@@ -281,6 +293,12 @@ function init(context,opts,callback){
 }
 
 //hooks
+/*
+* 执行hooks方法
+* des: 执行add_action添加的方法
+* @name 对应add_action的name
+* @arguments 执行hooks name对应方法所需的参数
+*/
 var actmap = new HashMap();
 function do_action(name){
     var funs=[]; 
@@ -322,7 +340,20 @@ function do_action(name){
     }
 }
 
-//
+/*
+* 添加hooks方法
+* @name string hooks方法
+* @fun name对应的方法
+* @num  fun方法的参数个数
+* @ctx context上下文
+*
+* SAMPLE 1
+* core.add_action('aaa',fun,3,window);
+* 
+* SAMPLE 2
+* var ctx = {'a':1,'b':2}
+* core.add_action('bbb',fun,2,ctx);
+*/
 function add_action(name,fun,propnum,ctx){
     clearTimeout(timeAddAction);
 
@@ -365,68 +396,38 @@ function add_action(name,fun,propnum,ctx){
     var timeAddAction = setTimeout(addAct, 200);
 }    
 
-/*消息弹出
-* @ show  string 后续扩展，必须有
-* @ msg  string  弹出消息内容，必须
-* @ [timeout] number 可不用写
+/*
+* 消息弹出抽象函数
+* 实例实现 tipsItem / tipsBox / anim
 */
 var tipsbox = function(){
-    var msg_left, msg_top;
-    var docRect = __measureDoc();
-    var scrollleft = docRect.sl;
-    var scrolltop = docRect.st;
-    var clientwidth = docRect.dw;
-    var clientheight = docRect.dh;  
-
-    this.pop = function(mmm,cb){                    
-        // init(this,{
-        //     tipsTpl : [newmsg,mmm]
-        //     ,tipsBox : msgbox
-        //     ,null: [pushmsg] 
-        // });
-        //原始写法                     
-        pushmsg.call(this,mmm);
+    this.pop = function(mmm,stat,cb){
+        if(!stat)stat='normal';
+        pushmsg.call(this,mmm,stat);
         var args = __arg2arr(arguments);
-        args = args.slice(2);
+        args = args.slice(3);
         if(cb){
             // add_action('tipsbox',[cb,kkkccc],cb.length,this);
-            add_action('tipsbox',cb,cb.length,this);
+            add_action('do_tipsbox',cb,cb.length,this);
         }
     }
 
-    //新建消息实例
-    this.tipsItem =function(){            
-        var tip = document.createElement('div');
-        var subtip = document.createElement('div');
-        tip.className = 'showmsg';
-        tip.style.cssText = 'display:none;width:100%;text-align:center; margin-top:10px;color:#fff;line-height:40px;font-size:16px;background-color:#4ba2f9;';
-        return tip;
-    }
+    //新建消息实例，可定制
+    this.tipsItem = function(stat){};
 
-    this.tipsBox=function(){
-        msg_left = Math.round((parseInt(clientwidth)-300)/2);
-        $('#msgcontainer').length ? '' : $('body').append('<div id="msgcontainer" style="z-Index:10030;width:300px;position:fixed;top:10px;left:'+msg_left+'px;"></div>');
-        return $('#msgcontainer')[0];
-    }
+    //消息实例容器，可定制
+    this.tipsBox = function(stat){};
 
-    //新建消息实例容器
-    function pushmsg(mm){        
-        var item = this.tipsItem();
-        var box = this.tipsBox();
+    //消息动画 实例化后必须定制
+    this.anim = function(item,container,stat){ if(!item) return;};
+
+    //组合执行方法
+    function pushmsg(mm,stat){
+        var item = this.tipsItem(stat);
+        var box = this.tipsBox(stat);
         item.innerHTML = mm;
         box.appendChild(item);
-        this.anim(item,box);
+        this.anim(item,box,stat);
+        return;
     }
-
-    this.anim=function(item,container){        
-        clearTimeout(ggg);
-        $(item).fadeIn('slow').delay(2000).animate({'height':0,'opacity':0,'margin':0},300);
-        var ggg = setTimeout(function(){
-            $(item).remove();
-            if($('.showmsg').length==0) $(container).remove();
-            do_action('tipsbox');
-        }, 3000);
-    }    
-}   
-
-window.tips = new tipsbox();
+}

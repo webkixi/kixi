@@ -19,7 +19,7 @@
 	    	var gzmenu = '<div id="gzmenu"><ul>\
 			<li class="remove">remove</li>\
 			<li class="clone">clone</li>\
-			<li>contextmenuitem 3</li></ul></div>';
+			<li class="edit">编辑</li></ul></div>';
 			if(!$('#gzmenu').length) $('body').append(gzmenu);
 			creatstyle('gzgzgz',function(gzgzgz){
 				gzgzgz.text('#gzmenu{position:absolute;width:150px;background-color:#fff;display:none;border:1px solid #666;border-bottom-width:0;}\
@@ -34,92 +34,111 @@
 	    	var 
 	    	_pen = this._pen,
 	    	_body = this._body;
-
+	    	_that = this;
 	    	this.length = item.length;
 
-	    	for(var i=0;i<item.length;i++)
-	    		{ item[i].setAttribute('gzindex',i); this._gzs.push(item[i]); }
+	    	$(item).each(function(i){
+	    		 var thegz = this;
+	    		 item[i].setAttribute('gzindex',i); _that._gzs.push(item[i]);
 
-	    	$(item).each(function(){
-	    		var thegz = this;
-	    		var thegzrect = __getRect(this);
-	    		var pos = {};
-	    		var scope;
-
-	    		$(thegz).find('.wangwang').each(function(){	    			
-			    	__put(this,true);
+	    		 $(this).find('.wangwang').each(function(){
+			    	__clientput(this);
 			    	if(this.parentNode.className!=='gzgz'){
 			    		scope = this.parentNode;
-			    	}else{
-			    		scope = thegz;
+			    	}else if(this.parentNode.className=='gzgz'){
+			    		scope = this.parentNode;
 			    	}
-	    			new _unitDiv(this,scope);
-	    		});
-	    		
-	    		$(_pen)
-	    			.on('mousedown',function(e){
-	    				e = e||arguments[0];
-	    				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
-	    			});
-	    		
-	    		$(document)
-		    		.mousedown(function(e){
-		    			e = e||arguments[0];
-		    			if(e.target == thegz) {
-			    			pendraw = true;		    			
-			    			if(e.which == 1){		    				
-								_pen.show();
-								_pen.css({'left':e.pageX,'top':e.pageY,'width':0,'height':0});
-								pos.startX = e.pageX;
-								pos.startY = e.pageY;
-							}
-						}
-						$('#gzmenu').hide();
-						_pen.html('');
-		    		})
-		    		.mousemove(function(e){
-						e=e||arguments[0];
-						if(e.which==1&&pendraw){
-							if(e.pageX<thegzrect.left){
-		    					msg_box('show','超出绘制区域，请在绘制区域操作!',1000);
-		    					return false;
-		    				}else{
-								_pen.css({'background-color':'red','width':e.pageX-parseInt(pos.startX),'height':e.pageY-parseInt(pos.startY)});
-								// _pen.html('<div style="position:absolute;top:48%;left:41%;">agzgz.com</div>');
-		    				}
-						}						
-					})
-					.mouseup(function(e){
-						e = e||arguments[0];
-						pendraw = false;  //					
-
-						if(_pen.width()>30&&_pen.height()>30){
-							kkk = e.ctrlKey ? new preCreatSubDiv(_pen,thegz,'float') : new preCreatSubDiv(_pen,thegz);
-						}else if(_pen.width()>3&&_pen.height()>3)
-							msg_box('show','最小30x30',1000);						
-						pos = {};						
-					});	
-
-				// $('#gzmenu ul li').on('mousedown',function(){
-				$('#gzmenu ul li').mousedown(function(e){
-					e=e||arguments[0];
-					e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
-					
-					if(this.className.indexOf('remove')>-1){						
-						__remove(opdiv);
-					}
-					if(this.className.indexOf('clone')>-1){
-						var clone = opdiv.div.cloneNode(true);
-						$(clone).attr('idindex',idindex);
-						$(clone).css('left',parseInt($(clone).css('left'))+30+'px');
-						$(clone).css('top',parseInt($(clone).css('top'))+20+'px');
-						$(opdiv.container).append(clone);
-						new _unitDiv(clone,opdiv.container);
-						__clone(opdiv,clone);
-						msg_box('show','clone ok',1000);
-					}				
-				});				
+			    	var iddex = $(this).attr('idindex');
+			    	if(iddex>=idindex) idindex=parseInt(iddex)+1;
+	    			new _unitDiv(this,this.parentNode);
+	    		}); 
 	    	});
+
+	    		
+    		var thegz,thegzrect;
+    		var pos = {};
+    		var scope;
+
+    		$(_pen)
+    			.on('mousedown',function(e){
+    				e = e||arguments[0];
+    				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
+    			});
+    		
+    		$(document)
+	    		.mousedown(function(e){
+	    			e = e||arguments[0];		    			
+	    			// if(e.target == thegz) {		    			
+	    			if(e.target.className=='gzgz'){		    				
+	    				thegz = e.target;
+			    		thegzrect = __getRect(thegz);
+		    			pendraw = true;		    			
+		    			if(e.which == 1){		    				
+							_pen.show();
+							_pen.css({'left':e.pageX,'top':e.pageY,'width':0,'height':0});
+							pos.startX = e.pageX;
+							pos.startY = e.pageY;
+						}
+					}
+					$('#gzmenu').hide();
+					_pen.html('');
+	    		})
+	    		.mousemove(function(e){
+					e=e||arguments[0];
+					if(e.which==1&&pendraw){
+						if(e.pageX<thegzrect.left){
+	    					tips('超出绘制区域，请在绘制区域操作!',1000);
+	    					return false;
+	    				}else{
+							_pen.css({'background-color':'red','width':e.pageX-parseInt(pos.startX),'height':e.pageY-parseInt(pos.startY)});
+							// _pen.html('<div style="position:absolute;top:48%;left:41%;">agzgz.com</div>');
+	    				}
+					}						
+				})
+				.mouseup(function(e){
+					e = e||arguments[0];
+					pendraw = false;  // 
+					if(_pen.width()>30&&_pen.height()>30){
+						kkk = e.ctrlKey ? new preCreatSubDiv(_pen,thegz,'float') : new preCreatSubDiv(_pen,thegz);
+					}else if(_pen.width()>3&&_pen.height()>3)
+						tips('最小30x30',1000);						
+					pos = {};						
+				});	
+
+			// $('#gzmenu ul li').on('mousedown',function(){			
+			$('#gzmenu ul li').mousedown(function(e){
+				e=e||arguments[0];
+				e.stopPropagation ? e.stopPropagation() : (e.cancelBubble = true);
+				
+				if(this.className.indexOf('remove')>-1){						
+					__remove(opdiv);
+				}
+				if(this.className.indexOf('clone')>-1){
+					var clone = opdiv.div.cloneNode(true);
+					$(clone).attr('idindex',idindex);
+					$(clone).css('left',parseInt($(clone).css('left'))+30+'px');
+					$(clone).css('top',parseInt($(clone).css('top'))+20+'px');
+					$(opdiv.container).append(clone);
+					new _unitDiv(clone,opdiv.container);
+					__clone(opdiv,clone);
+					tips('clone ok',1000);
+				}
+				if(this.className.indexOf('edit')>-1){					
+					tanbox("<div id='epiceditor' style='width:600px;height:300px;'></div><div class='form'><span id='submit'>提交</span><span>&nbsp;&nbsp;</span><span id='close'>取消</span></div>",'md');
+					var editor = new EpicEditor(opts).load();
+					$('#submit').click(function(){
+						var content = editor.getElement('editor').body.innerHTML;
+						__put(opdiv.div,content);
+						// var kbj = editor.open('epiceditor');
+						// var bbb = JSON.parse(kbj._storage.epiceditor);
+						// console.log(bbb.epiceditor.content);
+					});
+					$('#close').click(function(){						
+						$('body').trigger('closetanbox');
+						editor.unload();
+					})
+				}
+			});
 	        return this;
 	    }
 	}
@@ -127,12 +146,15 @@
 	var preCreatSubDiv = function(item,container,type){
 		var 
 		rect = __getRect(item),
-		crect = __getRect(container);		
+		crect = __getRect(container);	
+		// console.log($(container).attr('gzindex'));		
 		var position;			
 		(type=='float') ? position = 'float:left;' : position = 'position:absolute;';
 		var rzunit = '<div class="rzunit" >1</div>';
 		$(container).append('<div idindex="'+idindex+'" class="wangwang" style="z-index:1000;left:'+(rect.left-crect.left)+'px;top:'+(rect.top-crect.top)+'px;background-color:green;border:1px solid #ddd;width:'+rect.width+'px;height:'+rect.height+'px;'+position+'">'+rzunit+'</div>');		
 		var _unit = $('div[idindex='+idindex+']')[0];
+		_unit.setAttribute('gzindex',$(container).attr('gzindex'));
+		_unit.gzindex = $(container).attr('gzindex');
 		__put(_unit);
 		new _unitDiv(_unit,container);
 		// console.log(_wangs.size());
@@ -157,7 +179,7 @@
 	unitdrag = false,   //
 	cloneunit = false,
 	tt,
-	opdiv;  //use for clone, remove
+	opdiv;  //use for clone, remove	
 
 	var 
 	_unitDiv = Class.create();
@@ -169,7 +191,7 @@
 			var _rect = __getRect(item),
 			_crect = __getRect(container);
 			
-			var that = this;
+			var that = theunit = this;
 			that.idindex = $(item).attr('idindex');			
 			that.type = 'absolute';
 			that.div = _unit = item;
@@ -178,6 +200,7 @@
 				this.father = container.getAttribute('idindex');
 			}
 			that.container = container;
+			that.dragitem;
 			
 			$(_unit).children('.rzunit').mousedown(function(e){
 				e = e||arguments[0];
@@ -202,7 +225,7 @@
 							.attr('idindex',idindex);
 						tt = e.target;						
 						tt.appendChild(clone);
-						$('body').data('cloneunit',null);
+						$('body').data('cloneunit',null);						
 						new _unitDiv(clone,tt);
 						__put(_unit);
 					}
@@ -222,6 +245,9 @@
 				_nrect     = __getRect(this);
 				pos.startX = e.pageX;
 				pos.startY = e.pageY;	
+				if(e.ctrlKey){
+					that.dragitem = that.div;
+				}
 
 			}).contextmenu(function(e){				
 				e = e||arguments[0];
@@ -236,14 +262,16 @@
 
 			var endleft,endtop;
 			$(container).mousemove(function(e){
-				e = e||arguments[0];				
+				e = e||arguments[0];							
 				if(that.type==='absolute'&&unitdrag&&e.ctrlKey){					
 					endleft = _nrect.left+(e.pageX-pos.startX)-_crect.left;
 					endtop  = _nrect.top+(e.pageY-pos.startY)-_crect.top;
 					endleft = endleft < 0 ? 0 : endleft+_nrect.width > _crect.right-_crect.left ? (_crect.right-_crect.left-_nrect.width) : endleft;
 					endtop  = endtop  < 0 ? 0 : endtop+_nrect.height>_crect.bottom-_crect.top   ? (_crect.bottom-_crect.top-_nrect.height) : endtop;
-					that.div.style.left = endleft+'px';
-					that.div.style.top = endtop+'px';
+					if(that.dragitem == that.div){
+						that.div.style.left = endleft+'px';
+						that.div.style.top = endtop+'px';
+					}
 				}
 			});
 
@@ -253,16 +281,16 @@
 				_rzaction = false;   
 				$(document).trigger('resizeunit');
 				that.div.style.zIndex = 1000;			
-				if(unitdrag&&e.ctrlKey){
+				if(unitdrag&&e.ctrlKey){					
 					that.move = {"left":that.div.style.left,"top":that.div.style.top}
 					__move(that);
 					if(e.altKey) {
-						// var ounit = e.target;						
 						cloneunit = true;				
 						that.dataclone(that);						
 					}
 				}				
 				unitdrag = false;
+				that.dragitem = 'undefined';
 				pos={};
 			});
 			// console.log(e.relatedTarget);
@@ -284,10 +312,11 @@
 
 
 	//stack opration
-	function __put(unit,toback){
-		var obj;		
+	function __clientput(unit){
+		var obj;
 		if(!unit.hasOwnProperty('location')){
 			obj = {
+				'gzindex':$(unit).attr('gzindex'),
 				'id'    : $(unit).attr('idindex'),
 				'class' : unit.className,
 				'css'   : (function(){  var ncss,css; ncss = (css = unit.style.cssText.toLowerCase()).lastIndexOf(';')<(css.length-1) ? css+';' : css; return ncss;})(),
@@ -299,11 +328,34 @@
 		}
 		_wangs.put(obj.id,obj);
 		idindex++;
-		if(!toback){
-			init(zone,{
-				putstat:{'url':'/add','data':JSON.stringify(obj)}
-			},addfun);			
+	}
+
+	function __put(unit,content){
+		var obj;
+		if(content){
+			$(unit).prepend(content);
+			obj.cnt = content;
+		}else{
+			content = '';
 		}
+		if(!unit.hasOwnProperty('location')){			
+			obj = {
+				'gzindex':$(unit).attr('gzindex'),
+				'id'    : $(unit).attr('idindex'),
+				'class' : unit.className,
+				'css'   : (function(){  var ncss,css; ncss = (css = unit.style.cssText.toLowerCase()).lastIndexOf(';')<(css.length-1) ? css+';' : css; return ncss;})(),
+				'unit'  : unit.outerHTML,				
+				'cnt'   : content,
+				'location': window.location.href
+			};			
+		}else{
+			obj = unit;
+		}
+		_wangs.put(obj.id,obj);
+		idindex++;		
+		init(zone,{
+			putstat:{'url':'/add','data':JSON.stringify(obj)}
+		},addfun);
 	}
 	var addfun = function(){
 		if(zone.putstat.responseText=='ok'){
@@ -337,11 +389,6 @@
 		obj.unit = opdiv.div.outerHTML;
 
 		if(opdiv.hasOwnProperty('father')&&opdiv.father!=='gzgz'){
-			// obj = __get(opdiv.father);
-			// var kkbb = $(obj.unit).find('.wangwang[idindex='+opdiv.idindex+']').prop('outerHTML');
-			// obj.unit = obj.unit.replace(kkbb,opdiv.div.outerHTML);
-			// console.log('move ok');
-			// __put(obj);
 			__put(opdiv.container);
 			return;
 		}
@@ -400,7 +447,6 @@
 			key = $(item).attr('idindex');
 			obj = __get(key);
 		}
-		_wangs.remove(key);
 
 		if(opdiv.hasOwnProperty('father')&&opdiv.father!=='gzgz'){
 			$(opdiv.div).remove();
@@ -411,6 +457,7 @@
 			__put(obj);
 			return;
 		}
+		_wangs.remove(key);
 
 		var removefun=function(){
 			if(zone.removestat.responseText=='ok'){				
