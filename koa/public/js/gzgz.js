@@ -127,10 +127,18 @@
 					tanbox("<div id='epiceditor' style='width:600px;height:300px;'></div><div class='form'><span id='submit'>提交</span><span>&nbsp;&nbsp;</span><span id='close'>取消</span></div>",'md');
 					var editor = new EpicEditor(epic_opts).load();
 					$('#submit').click(function(){
-						// var content = editor.getElement('editor').body.innerHTML;
-						var kbj = editor.open('epiceditor');
-						var bbb = JSON.parse(kbj._storage.epiceditor);
-						var content = bbb.epiceditor.content;
+						editor.preview();
+						var content = editor.getElement('previewer').body.innerHTML;
+						// console.log(content);
+						// var kbj = editor.open('epiceditor');
+						// var bbb = JSON.parse(kbj._storage.epiceditor);
+						// var content = bbb.epiceditor.content;
+						
+						if($(opdiv.div).find('.md-body').length){							
+							$(opdiv.div).find('.md-body').html(content);
+						}else{							
+							$(opdiv.div).append('<div class="md-wrap"><div class="md-body">'+content+'</div></div>')
+						}
 						__put(opdiv.div,content,'md');
 					});
 					$('#close').click(function(){						
@@ -151,7 +159,7 @@
 		var position;			
 		(type=='float') ? position = 'float:left;' : position = 'position:absolute;';
 		var rzunit = '<div class="rzunit" >1</div>';
-		$(container).append('<div idindex="'+idindex+'" class="wangwang" style="z-index:1000;left:'+(rect.left-crect.left)+'px;top:'+(rect.top-crect.top)+'px;background-color:green;border:1px solid #ddd;width:'+rect.width+'px;height:'+rect.height+'px;'+position+'">'+rzunit+'</div>');		
+		$(container).append('<div idindex="'+idindex+'" class="wangwang" style="left:'+(rect.left-crect.left)+'px;top:'+(rect.top-crect.top)+'px;width:'+rect.width+'px;height:'+rect.height+'px;'+position+'">'+rzunit+'</div>');		
 		var _unit = $('div[idindex='+idindex+']')[0];
 		_unit.setAttribute('gzindex',$(container).attr('gzindex'));
 		_unit.gzindex = $(container).attr('gzindex');
@@ -320,6 +328,10 @@
 				'id'    : $(unit).attr('idindex'),
 				'class' : unit.className,
 				'css'   : (function(){  var ncss,css; ncss = (css = unit.style.cssText.toLowerCase()).lastIndexOf(';')<(css.length-1) ? css+';' : css; return ncss;})(),
+				'cnt'   : (function(){ 
+							if($(unit).find('.markdown-body')) return $(unit).find('.markdown-body').html();
+							else return '';
+						  })(),
 				'unit'  : unit.outerHTML,
 				'location': window.location.href
 			};
@@ -428,15 +440,8 @@
 		obj = __get(opdiv.idindex);
 		obj.css = opdiv.div.style.cssText.toLowerCase();
 		obj.unit = opdiv.div.outerHTML;
-	    init(zone,{
-			movestat:{'url':'/move','data':JSON.stringify(obj)}
-		},movefun);		
-	}
-	var movefun=function(){
-		if(zone.movestat.responseText=='ok'){
-			zone.movestat= null;
-			console.log('move ok');
-		}
+		console.log('move ok');
+		__put(obj);	 		
 	}
 
 	function __remove(item){

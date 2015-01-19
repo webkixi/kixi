@@ -184,13 +184,6 @@ function *dealindex(){
  */
 function *add(){	
 	var body = yield parse.json(this);
-	if(body.cnt&&body.cnt!='') {
-		console.log(body.cnt);
-		// body.cnt = body.cnt.replace(/&gt;/g,'>');
-		var newstr = markdown( body.cnt);
-		console.log(newstr);
-		body.cnt = newstr;
-	}
 	var 
 	path = url.parse(body.location).pathname.replace('/','').replace(/(\.[\w]+)/,'').toLowerCase(),
 	id   = 'id'+body.id;
