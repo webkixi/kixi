@@ -5,6 +5,7 @@ var parse = require('co-body');
 var statics = require('koa-static-cache');
 var url = require('url');
 var exec = require('child_process').exec;
+var markdown = require( "markdown-js" ).markdown;
 
 var jsdom = require('jsdom');
 var env = jsdom.env;
@@ -183,6 +184,13 @@ function *dealindex(){
  */
 function *add(){	
 	var body = yield parse.json(this);
+	if(body.cnt&&body.cnt!='') {
+		console.log(body.cnt);
+		// body.cnt = body.cnt.replace(/&gt;/g,'>');
+		var newstr = markdown( body.cnt);
+		console.log(newstr);
+		body.cnt = newstr;
+	}
 	var 
 	path = url.parse(body.location).pathname.replace('/','').replace(/(\.[\w]+)/,'').toLowerCase(),
 	id   = 'id'+body.id;

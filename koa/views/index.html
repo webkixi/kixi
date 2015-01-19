@@ -27,7 +27,7 @@
 	@-moz-keyframes transform-6 { from{-moz-transform:perspective(400px) rotateX(0deg); } to{-moz-transform:perspective(400px) rotateX(360deg); } }
 	@keyframes transform-6 { from{transform:perspective(400px) rotateX(0deg); } to{transform:perspective(400px) rotateX(360deg); } }	
   </style>
-  
+  <link rel="stylesheet" type="text/css" href="css/github-markdown.css">
 <script type='text/javascript' src='js/jq183.js'></script>
 </head>
 <body>
@@ -54,40 +54,16 @@
 
 
 <script type="text/javascript">
-var opts = {
+var epic_opts = {
     container: 'epiceditor',
     textarea: null,
-    basePath: '',
-    clientSideStorage: true,
-    localStorageName: 'epiceditor',
-    useNativeFullscreen: true,
+    basePath: 'js',
     parser: marked,
     file: {
         name: 'epiceditor',
         defaultContent: '',
         autoSave: 100
-    },
-    theme: {
-        base: '/js/themes/base/epiceditor.css',
-        preview: '/js/themes/preview/preview-dark.css',
-        editor: '/js/themes/editor/epic-dark.css'
-    },
-    button: {
-        preview: true,
-        fullscreen: true,
-        bar: "auto"
-    },
-    focusOnLoad: false,
-    shortcut: {
-        modifier: 18,
-        fullscreen: 70,
-        preview: 80
-    },
-    string: {
-        togglePreview: 'Toggle Preview Mode',
-        toggleEdit: 'Toggle Edit Mode',
-        toggleFullscreen: 'Enter Fullscreen'
-    },
+    },    
     autogrow: false
 }
 
@@ -106,8 +82,14 @@ var opts = {
         if(data && data.length>0){
             for(var i=0; i<data.length; i++){
                 var unit = data[i];
-                if(unit.gzindex==j)
-                    looptpl[j]+=data[i].unit+'\n';
+                if(unit.gzindex==j){
+                            if(unit.cnt!=''){
+                                    var uuu =$(unit.unit);
+                                    uuu.prepend(unit.cnt);
+                                    unit.unit = uuu[0].outerHTML;
+                            }
+                            looptpl[j]+=data[i].unit+'\n';
+                }
             }
             //bc(data[0]);
         }

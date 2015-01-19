@@ -125,13 +125,13 @@
 				}
 				if(this.className.indexOf('edit')>-1){					
 					tanbox("<div id='epiceditor' style='width:600px;height:300px;'></div><div class='form'><span id='submit'>提交</span><span>&nbsp;&nbsp;</span><span id='close'>取消</span></div>",'md');
-					var editor = new EpicEditor(opts).load();
+					var editor = new EpicEditor(epic_opts).load();
 					$('#submit').click(function(){
-						var content = editor.getElement('editor').body.innerHTML;
-						__put(opdiv.div,content);
-						// var kbj = editor.open('epiceditor');
-						// var bbb = JSON.parse(kbj._storage.epiceditor);
-						// console.log(bbb.epiceditor.content);
+						// var content = editor.getElement('editor').body.innerHTML;
+						var kbj = editor.open('epiceditor');
+						var bbb = JSON.parse(kbj._storage.epiceditor);
+						var content = bbb.epiceditor.content;
+						__put(opdiv.div,content,'md');
 					});
 					$('#close').click(function(){						
 						$('body').trigger('closetanbox');
@@ -330,11 +330,15 @@
 		idindex++;
 	}
 
-	function __put(unit,content){
-		var obj;
+	function __put(unit,content,type){
+		var obj={};
 		if(content){
-			$(unit).prepend(content);
-			obj.cnt = content;
+			if(type=='md'){
+				// obj.md = content;
+				// $(unit).prepend(content);
+			}else{
+				// $(unit).prepend(content);
+			}
 		}else{
 			content = '';
 		}
@@ -344,7 +348,7 @@
 				'id'    : $(unit).attr('idindex'),
 				'class' : unit.className,
 				'css'   : (function(){  var ncss,css; ncss = (css = unit.style.cssText.toLowerCase()).lastIndexOf(';')<(css.length-1) ? css+';' : css; return ncss;})(),
-				'unit'  : unit.outerHTML,				
+				'unit'  : unit.outerHTML,
 				'cnt'   : content,
 				'location': window.location.href
 			};			
